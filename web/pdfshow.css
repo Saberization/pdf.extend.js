@@ -1,0 +1,142 @@
+﻿body {
+}
+
+.slade {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    background-color: hsla(0,0%,0%,.2);
+}
+*{ margin: 0; padding: 0; }
+
+#delsigndiv {
+    width: 80px;
+    background: rgba(78, 78, 78, 1);
+    position: absolute;
+    display: none;
+    box-shadow: 2px 2px 7px #888888;
+    border-radius: 5px;
+}
+
+#delsigndiv ul {
+    list-style: none;
+    border: 2px solid #666;
+    border-bottom: 0px;
+    border-radius: 4px;
+}
+
+#delsigndiv ul li {
+    height: 30px;
+    color: rgba(255, 255, 255, 1);
+    line-height: 30px;
+    text-align: center;
+    border-bottom: 2px solid #666;
+    cursor: default;
+}
+
+/* 上传弹窗 */
+.upload-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 637px;
+    height: 187px;
+    margin-left: -318.5px;
+    margin-top: -93.5px;
+    border: 1px solid rgba(0,0,0,0.2);
+    background: #fff;
+    box-sizing: border-box;
+    font-size: 13px;
+}
+
+.upload-title {
+    padding: 20px;
+    margin-top: -3px;
+    font-size: 16px;
+    font-weight: bold;
+    vertical-align: baseline;
+}
+
+.upload-header {
+    text-decoration: none;
+    font-size: 13px;
+    color: #777;
+    padding-left: 20px;
+    cursor: pointer;
+}
+
+.upload-header div {
+    padding: 7px;
+}
+
+.upload-header div:first-child {
+    margin-right: 10px;
+}
+
+.upload-header div.cur {
+    background: #F5F5F5;
+    border: 1px solid #CCC;
+    border-bottom: 0;
+    color: #222;
+}
+
+.upload-body {
+    background: #F5F5F5;
+    border-top: 1px solid #CCC;
+    color: #222;
+    padding: 20px;
+    height: 51px;
+}
+
+.network-input {
+    width: 500px !important;
+    margin: 0;
+    padding: 0 0 0 15px;
+    vertical-align: top;
+    width: 100%;
+    font: 16px arial,sans-serif;
+    line-height: 34px;
+    height: 34px !important;
+}
+
+.upload-network .upload-submit {
+    background-color: #4d90fe;
+    display: inline-block;
+    font-weight: bold;
+    line-height: 29px;
+    min-width: 54px;
+    padding: 0 10px;
+    margin-left: 10px;
+    height: 37px;
+    text-align: center;
+    border-radius: 2px;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+.upload-close {
+    position: absolute;
+    font-size: 16px;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    color: #f00;
+}
+
+.l {
+    float: left;
+}
+
+.r {
+    float: right;
+}
+
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+.clearfix{*+height:1%;}
+
+.hidden {
+    display: none;
+}
