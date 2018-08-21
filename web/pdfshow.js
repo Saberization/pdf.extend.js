@@ -698,8 +698,12 @@ var pdfJsApi;
         });
         evt.source.textLayerDiv.dispatchEvent(event);
       });
+      // TODO: pdfDocument 改变后触发，这里进行获取当前页
       eventBus.on('pagechange', function (evt) {
+        var getCurrentPage = pdfJsApi.getCurrentPage || function() {};
         var event = document.createEvent('UIEvents');
+
+        getCurrentPage.call(pdfJsApi, evt.pageNumber);
         event.initUIEvent('pagechange', true, true, window, 0);
         event.pageNumber = evt.pageNumber;
         evt.source.container.dispatchEvent(event);
@@ -709,8 +713,13 @@ var pdfJsApi;
         event.initCustomEvent('pagesinit', true, true, null);
         evt.source.container.dispatchEvent(event);
       });
+      // TODO: pdfDocument 加载完毕后触发 pagesloaded
       eventBus.on('pagesloaded', function (evt) {
         var event = document.createEvent('CustomEvent');
+        var getPageCount = pdfJsApi.getPageCount || function() {};
+        // 获取pdf的总页数
+        getPageCount.call(pdfJsApi, evt.pagesCount);
+
         event.initCustomEvent('pagesloaded', true, true, {
           pagesCount: evt.pagesCount
         });
@@ -2223,6 +2232,7 @@ var pdfJsApi;
       var pageNumber = evt.pageNumber;
       var pageIndex = pageNumber - 1;
       var pageView = PDFViewerApplication.pdfViewer.getPageView(pageIndex);
+
       if (pageNumber === PDFViewerApplication.page) {
         PDFViewerApplication.toolbar.updateLoadingIndicatorState(false);
       }
@@ -2383,9 +2393,6 @@ var pdfJsApi;
         appConfig.secondaryToolbar.downloadButton.setAttribute('hidden', 'true');
       };
     }
-
-    // TODO:
-    function webViewerUploadFile() {}
 
     function webViewerPresentationMode() {
       PDFViewerApplication.requestPresentationMode();
@@ -9159,7 +9166,7 @@ var pdfJsApi;
       }, {
         key: 'setDocument',
         value: function setDocument(pdfDocument) {
-          // TODO: 文档加载完毕后触发这边
+          // TODO: 文档加载完毕后触发这边 pagesCount
           var _this = this;
 
           if (this.pdfDocument) {
@@ -9180,6 +9187,7 @@ var pdfJsApi;
               pagesCount: pagesCount
             });
           });
+
           var isOnePageRenderedResolved = false;
           var onePageRenderedCapability = (0, _pdfjsLib.createPromiseCapability)();
           this.onePageRendered = onePageRenderedCapability.promise;

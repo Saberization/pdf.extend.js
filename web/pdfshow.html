@@ -407,8 +407,12 @@
                 viewBookmark: false
             },
 
-            getPdfPageCount: function(result) {
-                console.log(result);
+            getPageCount: function(pageCount) {
+                console.log('总页数：' + pageCount);
+            },
+
+            getCurrentPage: function(pageNumber) {
+                console.log('当前页：' + pageNumber);
             }
         };
 
