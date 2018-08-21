@@ -2218,6 +2218,7 @@ var pdfJsApi;
       };
     }
 
+    // TODO: lazyload 每次都会在这里加载
     function webViewerPageRendered(evt) {
       var pageNumber = evt.pageNumber;
       var pageIndex = pageNumber - 1;
@@ -2375,7 +2376,7 @@ var pdfJsApi;
         }
         PDFViewerApplication.setTitleUsingUrl(file.name);
         var appConfig = PDFViewerApplication.appConfig;
-        console.log(appConfig);
+
         appConfig.toolbar.viewBookmark.setAttribute('hidden', 'true');
         appConfig.secondaryToolbar.viewBookmarkButton.setAttribute('hidden', 'true');
         appConfig.toolbar.download.setAttribute('hidden', 'true');
@@ -2881,6 +2882,7 @@ var pdfJsApi;
       }, {
         key: 'navigateTo',
         value: function navigateTo(dest) {
+          // TODO: navigateTo
           var _this = this;
 
           var goToDestination = function goToDestination(_ref2) {
@@ -4019,7 +4021,8 @@ var pdfJsApi;
     var activeService = null;
     var overlayManager = null;
 
-    function renderPage(activeServiceOnEntry, pdfDocument, pageNumber, size) {
+    // TODO: renderPage 渲染页面
+    function renderPage(activeServiceOnEntry, pdfDocument, pageNumber, size) {      
       var scratchCanvas = activeService.scratchCanvas;
       var PRINT_RESOLUTION = 150;
       var PRINT_UNITS = PRINT_RESOLUTION / 72.0;
@@ -9156,6 +9159,7 @@ var pdfJsApi;
       }, {
         key: 'setDocument',
         value: function setDocument(pdfDocument) {
+          // TODO: 文档加载完毕后触发这边
           var _this = this;
 
           if (this.pdfDocument) {
@@ -9723,6 +9727,7 @@ var pdfJsApi;
           });
         }
       }, {
+        // TODO: 总页数
         key: 'pagesCount',
         get: function get() {
           return this._pages.length;
@@ -9733,6 +9738,7 @@ var pdfJsApi;
           return this._pageViewsReady;
         }
       }, {
+        // TODO: 当前页
         key: 'currentPageNumber',
         get: function get() {
           return this._currentPageNumber;
