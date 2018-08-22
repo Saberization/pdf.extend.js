@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+// TODO:
+
 var pdfJsApi;
 
 /******/
@@ -700,12 +702,11 @@ var pdfJsApi;
       });
       // TODO: pdfDocument 改变后触发，这里进行获取当前页
       eventBus.on('pagechange', function (evt) {
-        var getCurrentPage = pdfJsApi.getCurrentPage || function() {};
         var event = document.createEvent('UIEvents');
 
-        getCurrentPage.call(pdfJsApi, evt.pageNumber);
         event.initUIEvent('pagechange', true, true, window, 0);
         event.pageNumber = evt.pageNumber;
+        pdfJsApi.getCurrentPage = evt.pageNumber;
         evt.source.container.dispatchEvent(event);
       });
       eventBus.on('pagesinit', function (evt) {
@@ -716,10 +717,8 @@ var pdfJsApi;
       // TODO: pdfDocument 加载完毕后触发 pagesloaded
       eventBus.on('pagesloaded', function (evt) {
         var event = document.createEvent('CustomEvent');
-        var getPageCount = pdfJsApi.getPageCount || function() {};
-        // 获取pdf的总页数
-        getPageCount.call(pdfJsApi, evt.pagesCount);
 
+        pdfJsApi.getPageCount = evt.pagesCount;
         event.initCustomEvent('pagesloaded', true, true, {
           pagesCount: evt.pagesCount
         });
@@ -788,6 +787,7 @@ var pdfJsApi;
         });
         window.dispatchEvent(event);
       });
+      // TODO: 书签加载完毕
       eventBus.on('outlineloaded', function (evt) {
         var event = document.createEvent('CustomEvent');
         event.initCustomEvent('outlineloaded', true, true, {
@@ -1318,6 +1318,7 @@ var pdfJsApi;
               contextMenuItems: appConfig.fullscreen
             });
           }
+
           _this2.passwordPrompt = new _password_prompt.PasswordPrompt(appConfig.passwordOverlay, _this2.overlayManager, _this2.l10n);
           _this2.pdfOutlineViewer = new _pdf_outline_viewer.PDFOutlineViewer({
             container: appConfig.sidebar.outlineView,
@@ -1332,6 +1333,7 @@ var pdfJsApi;
           var sidebarConfig = Object.create(appConfig.sidebar);
           sidebarConfig.pdfViewer = _this2.pdfViewer;
           sidebarConfig.pdfThumbnailViewer = _this2.pdfThumbnailViewer;
+          // TODO: 书签 sidebarConfig
           sidebarConfig.pdfOutlineViewer = _this2.pdfOutlineViewer;
           sidebarConfig.eventBus = eventBus;
           _this2.pdfSidebar = new _pdf_sidebar.PDFSidebar(sidebarConfig, _this2.l10n);
@@ -1945,6 +1947,9 @@ var pdfJsApi;
         eventBus.on('zoomin', webViewerZoomIn);
         eventBus.on('zoomout', webViewerZoomOut);
         eventBus.on('pagenumberchanged', webViewerPageNumberChanged);
+        pdfJsApi.pageNumberNavitorTo = function(value) {
+          webViewerPageNumberNavitorTo(value);
+        };
         eventBus.on('scalechanged', webViewerScaleChanged);
         eventBus.on('rotatecw', webViewerRotateCw);
         eventBus.on('rotateccw', webViewerRotateCcw);
@@ -2052,9 +2057,11 @@ var pdfJsApi;
     var validateFileURL = void 0; {
       var HOSTED_VIEWER_ORIGINS = ['null', 'http://mozilla.github.io', 'https://mozilla.github.io'];
       validateFileURL = function validateFileURL(file) {
+
         if (file === undefined) {
           return;
         }
+
         try {
           var viewerOrigin = new URL(window.location.href).origin || 'null';
           if (HOSTED_VIEWER_ORIGINS.indexOf(viewerOrigin) >= 0) {
@@ -2096,9 +2103,8 @@ var pdfJsApi;
       });
     }
 
-    function webViewerInitialized() {
+    function webViewerInitialized(file) {
       var appConfig = PDFViewerApplication.appConfig;
-      var file = void 0;
       var queryString = document.location.search.substring(1);
       var params = (0, _ui_utils.parseQueryString)(queryString);
       //如果initData.url有值则用此url载入pdf，在页面window.onload中为其赋值
@@ -2202,7 +2208,10 @@ var pdfJsApi;
         });
       });
     }
-    var webViewerOpenFileViaURL = void 0; {
+
+    // TODO: webViewerOpenFileViaURL
+    window.webViewerOpenFileViaURL = void 0;
+    {
       webViewerOpenFileViaURL = function webViewerOpenFileViaURL(file) {
         if (file && file.lastIndexOf('file:', 0) === 0) {
           PDFViewerApplication.setTitleUsingUrl(file);
@@ -2223,6 +2232,7 @@ var pdfJsApi;
         }
         if (file) {
           PDFViewerApplication.open(file);
+          pdfJsApi.getNetWorkPath && pdfJsApi.getNetWorkPath.call(pdfJsApi, file);
         }
       };
     }
@@ -2440,10 +2450,15 @@ var pdfJsApi;
       PDFViewerApplication.zoomOut();
     }
 
+    // TODO: 这里是输入页面跳转至对应页的回调事件
     function webViewerPageNumberChanged(evt) {
+      webViewerPageNumberNavitorTo(evt.value);
+    }
+
+    function webViewerPageNumberNavitorTo(value) {
       var pdfViewer = PDFViewerApplication.pdfViewer;
-      pdfViewer.currentPageLabel = evt.value;
-      if (evt.value !== pdfViewer.currentPageNumber.toString() && evt.value !== pdfViewer.currentPageLabel) {
+      pdfViewer.currentPageLabel = value;
+      if (value !== pdfViewer.currentPageNumber.toString() && value !== pdfViewer.currentPageLabel) {
         PDFViewerApplication.toolbar.setPageNumber(pdfViewer.currentPageNumber, pdfViewer.currentPageLabel);
       }
     }
@@ -2889,7 +2904,7 @@ var pdfJsApi;
       }, {
         key: 'navigateTo',
         value: function navigateTo(dest) {
-          // TODO: navigateTo
+          // TODO: navigateTo 书签跳转
           var _this = this;
 
           var goToDestination = function goToDestination(_ref2) {
@@ -6876,6 +6891,7 @@ var pdfJsApi;
             return;
           }
           var destination = item.dest;
+          // TODO: 绑定点击书签跳转
           element.href = this.linkService.getDestinationHash(destination);
           element.onclick = function () {
             if (destination) {
@@ -6951,7 +6967,9 @@ var pdfJsApi;
             parent: fragment,
             items: this.outline
           }];
+          var result = [];
           var hasAnyNesting = false;
+
           while (queue.length > 0) {
             var levelData = queue.shift();
             for (var i = 0, len = levelData.items.length; i < len; i++) {
@@ -6959,6 +6977,7 @@ var pdfJsApi;
               var div = document.createElement('div');
               div.className = 'outlineItem';
               var element = document.createElement('a');
+              result.push(item);
               this._bindLink(element, item);
               this._setStyles(element, item);
               element.textContent = (0, _pdfjsLib.removeNullCharacters)(item.title) || DEFAULT_TITLE;
@@ -6978,6 +6997,21 @@ var pdfJsApi;
               outlineCount++;
             }
           }
+
+          var _this = this;
+          // TODO: 跳转书签
+          window.linkTo = function(text) {
+            for (var i = 0, len = result.length; i < len; i++) {
+              var title = result[i].title;
+
+              if (~title.indexOf(text)) {
+                _this.linkService.navigateTo(result[i].dest);
+
+                return title;
+              }
+            }
+          };
+
           if (hasAnyNesting) {
             this.container.classList.add('outlineWithDeepNesting');
           }
@@ -7160,6 +7194,7 @@ var pdfJsApi;
       }, {
         key: 'update',
         value: function update(scale, rotation) {
+          // TODO: 页面更新
           this.scale = scale || this.scale;
           if (typeof rotation !== 'undefined') {
             this.rotation = rotation;
@@ -7307,6 +7342,7 @@ var pdfJsApi;
           } else {
             div.appendChild(canvasWrapper);
           }
+
           var textLayer = null;
           if (this.textLayerFactory) {
             var textLayerDiv = document.createElement('div');
@@ -10773,6 +10809,8 @@ var pdfJsApi;
             items = this.items,
             signatureToolbar = appConfig.signatureToolbar;
 
+          console.log(PDFViewerApplication);
+
           var self = this;
           items.previous.addEventListener('click', function () {
             eventBus.dispatch('previouspage');
@@ -11280,6 +11318,15 @@ var pdfJsApi;
           print: true,
           download: true,
           secondaryToolbar: true
+        },
+        pageNumberNavitorTo: function() {},
+        getCurrentPage: 1,
+        getPageCount: 1,
+        openPath: function(path) {
+          window.webViewerOpenFileViaURL(path);
+        },
+        linkTo: function(text) {
+          window.linkTo && window.linkTo(text);
         }
       };
 

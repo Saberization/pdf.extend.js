@@ -643,6 +643,7 @@ var Util = function UtilClosure() {
   Util.applyTransform = function Util_applyTransform(p, m) {
     var xt = p[0] * m[0] + p[1] * m[2] + m[4];
     var yt = p[0] * m[1] + p[1] * m[3] + m[5];
+    
     return [xt, yt];
   };
   Util.applyInverseTransform = function Util_applyInverseTransform(p, m) {
@@ -687,6 +688,7 @@ var Util = function UtilClosure() {
       r[1] = rect[3];
       r[3] = rect[1];
     }
+
     return r;
   };
   Util.intersect = function Util_intersect(rect1, rect2) {
@@ -710,6 +712,7 @@ var Util = function UtilClosure() {
     } else {
       return false;
     }
+
     return result;
   };
   Util.sign = function Util_sign(num) {
@@ -752,6 +755,7 @@ var Util = function UtilClosure() {
     if (!dict) {
       return null;
     }
+
     return getArray ? dict.getArray(name) : dict.get(name);
   };
   Util.inherit = function Util_inherit(sub, base, prototype) {
@@ -1394,9 +1398,9 @@ MessageHandler.prototype = {
   },
   postMessage: function postMessage(message, transfers) {
     if (transfers && this.postMessageTransfers) {
-      this.comObj.postMessage(message, transfers);
+      this.comObj.postMessage && this.comObj.postMessage(message, transfers);
     } else {
-      this.comObj.postMessage(message);
+      this.comObj.postMessage && this.comObj.postMessage(message);
     }
   },
   destroy: function destroy() {
@@ -1553,6 +1557,7 @@ var Dict = function DictClosure() {
         return xref ? xref.fetchIfRef(value, suppressEncryption) : value;
       }
       value = this._map[key3] || null;
+
       return xref ? xref.fetchIfRef(value, suppressEncryption) : value;
     },
     getAsync: function Dict_getAsync(key1, key2, key3) {
@@ -27511,6 +27516,7 @@ AnnotationFactory.prototype = {
       case 'Widget':
         var fieldType = _util.Util.getInheritableProperty(dict, 'FT');
         fieldType = (0, _primitives.isName)(fieldType) ? fieldType.name : null;
+
         switch (fieldType) {
           case 'Tx':
             return new TextWidgetAnnotation(parameters);
@@ -27825,8 +27831,12 @@ var WidgetAnnotation = function WidgetAnnotationClosure() {
       data.fieldFlags = 0;
     }
     data.readOnly = this.hasFieldFlag(_util.AnnotationFieldFlag.READONLY);
+
+    console.log(data);
+
     if (data.fieldType === 'Sig') {
-      this.setFlags(_util.AnnotationFlag.HIDDEN);
+      // TODO: 显示数字签名
+      // this.setFlags(_util.AnnotationFlag.HIDDEN);
     }
   }
   _util.Util.inherit(WidgetAnnotation, Annotation, {
@@ -27852,6 +27862,7 @@ var WidgetAnnotation = function WidgetAnnotationClosure() {
           fieldName.unshift((0, _util.stringToPDFString)(loopDict.get('T')));
         }
       }
+
       return fieldName.join('.');
     },
     hasFieldFlag: function WidgetAnnotation_hasFieldFlag(flag) {
@@ -27998,6 +28009,7 @@ var TextAnnotation = function TextAnnotationClosure() {
       this.data.rect[2] = this.data.rect[0] + DEFAULT_ICON_SIZE;
       this.data.name = parameters.dict.has('Name') ? parameters.dict.get('Name').name : 'Note';
     }
+    
     this._preparePopup(parameters.dict);
   }
   _util.Util.inherit(TextAnnotation, Annotation, {});
@@ -28031,7 +28043,7 @@ var PopupAnnotation = function PopupAnnotationClosure() {
     this.data.parentType = (0, _primitives.isName)(parentSubtype) ? parentSubtype.name : null;
     this.data.parentId = dict.getRaw('Parent').toString();
     this.data.title = (0, _util.stringToPDFString)(parentItem.get('T') || '');
-    this.data.contents = (0, _util.stringToPDFString)(parentItem.get('Contents') || '');
+    this.data.contents = (0, _util.stringToPDFString)(parentItem.get('Contents') || '')
     if (!parentItem.has('C')) {
       this.data.color = null;
     } else {
@@ -32871,6 +32883,7 @@ var PDFImage = function PDFImageClosure() {
     }
     return dest;
   }
+  // TODO: PDFImage
   function PDFImage(xref, res, image, inline, smask, mask, isMask) {
     this.image = image;
     var dict = image.dict;

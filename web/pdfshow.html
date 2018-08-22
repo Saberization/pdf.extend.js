@@ -382,9 +382,15 @@
              * 获取上传路径
              * @param {String} path 上传路径
              * 必须开启 工具 -> Internet选项 -> 安全 -> 自定义级别 -> 找到“其他”中的“将本地文件上载至服务器时包含本地目录路径”
+             * 
+             * pageNumberNavitorTo 跳转对应页面
+             * getCurrentPage
+             * getPageCount
+             * openPath http://192.168.118.28:8082/pdf.extend.js/signed_dest.pdf
+             * linkTo
              */
             getFilePath: function (path) {
-                console.log(path);
+                // console.log(path);
             },
 
             tools: {
@@ -407,12 +413,8 @@
                 viewBookmark: false
             },
 
-            getPageCount: function(pageCount) {
-                console.log('总页数：' + pageCount);
-            },
-
-            getCurrentPage: function(pageNumber) {
-                console.log('当前页：' + pageNumber);
+            getNetWorkPath: function(path) {
+                console.log(path);
             }
         };
 
