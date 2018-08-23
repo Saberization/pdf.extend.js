@@ -16761,6 +16761,7 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
     var cs = _colorspace.ColorSpace.parse(dict.get('ColorSpace', 'CS'), xref, res);
     return (cs.numComps === 1 || cs.numComps === 3) && cs.isDefaultDecode(dict.getArray('Decode', 'D'));
   };
+  // TODO: PartialEvaluator
   function PartialEvaluator(_ref) {
     var _this = this;
 
@@ -16966,6 +16967,7 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
         }
       });
     },
+    // TODO: buildPaintImageXObject
     buildPaintImageXObject: function PartialEvaluator_buildPaintImageXObject(resources, image, inline, operatorList, cacheKey, imageCache) {
       var _this2 = this;
 
@@ -19493,6 +19495,7 @@ var QueueOptimizer = function QueueOptimizerClosure() {
     return count - i;
   }
   var InitialState = [];
+  // TODO: addState
   addState(InitialState, [_util.OPS.save, _util.OPS.transform, _util.OPS.paintInlineImageXObject, _util.OPS.restore], function foundInlineImageGroup(context) {
     var MIN_IMAGES_IN_INLINE_IMAGES_BLOCK = 10;
     var MAX_IMAGES_IN_INLINE_IMAGES_BLOCK = 200;
@@ -19541,6 +19544,7 @@ var QueueOptimizer = function QueueOptimizerClosure() {
       currentX += img.width + 2 * IMAGE_PADDING;
       maxLineHeight = Math.max(maxLineHeight, img.height);
     }
+
     var imgWidth = Math.max(maxX, currentX) + IMAGE_PADDING;
     var imgHeight = currentY + maxLineHeight + IMAGE_PADDING;
     var imgData = new Uint8Array(imgWidth * imgHeight * 4);
@@ -19569,6 +19573,9 @@ var QueueOptimizer = function QueueOptimizerClosure() {
         offset -= imgRowSize;
       }
     }
+
+    console.log(offset);
+    console.log(map);
     fnArray.splice(iFirstSave, count * 4, _util.OPS.paintInlineImageXObjectGroup);
     argsArray.splice(iFirstSave, count * 4, [{
       width: imgWidth,
@@ -23125,12 +23132,14 @@ var ObjectLoader = function () {
     this.capability = null;
   }
   ObjectLoader.prototype = {
+    // TODO: load
     load: function load() {
       this.capability = (0, _util.createPromiseCapability)();
       if (!(this.xref.stream instanceof _chunked_stream.ChunkedStream) || this.xref.stream.getMissingChunks().length === 0) {
         this.capability.resolve();
         return this.capability.promise;
       }
+
       var keys = this.keys,
           dict = this.dict;
 
@@ -23142,6 +23151,7 @@ var ObjectLoader = function () {
           nodesToVisit.push(rawValue);
         }
       }
+
       this._walk(nodesToVisit);
       return this.capability.promise;
     },
@@ -27601,6 +27611,7 @@ var Annotation = function AnnotationClosure() {
       if (this.flags === 0) {
         return false;
       }
+
       return this._isPrintable(this.flags);
     },
     setFlags: function Annotation_setFlags(flags) {
@@ -27698,13 +27709,17 @@ var Annotation = function AnnotationClosure() {
       this.data.title = (0, _util.stringToPDFString)(dict.get('T') || '');
       this.data.contents = (0, _util.stringToPDFString)(dict.get('Contents') || '');
     },
+    // TODO: loadResources 这里是盖章的
     loadResources: function Annotation_loadResources(keys) {
       return this.appearance.dict.getAsync('Resources').then(function (resources) {
         if (!resources) {
           return;
         }
+
         var objectLoader = new _obj.ObjectLoader(resources, keys, resources.xref);
+
         return objectLoader.load().then(function () {
+          console.log(resources);
           return resources;
         });
       });
@@ -29264,7 +29279,9 @@ var Page = function PageClosure() {
         return objectLoader.load();
       });
     },
+    // TODO: 渲染签章的地方
     getOperatorList: function getOperatorList(_ref) {
+      console.log(_ref);
       var _this2 = this;
 
       var handler = _ref.handler,
@@ -33224,6 +33241,7 @@ var PDFImage = function PDFImageClosure() {
         } else if (this.colorSpace.name === 'DeviceRGB' && bpc === 8 && !this.needsDecode) {
           kind = _util.ImageKind.RGB_24BPP;
         }
+       
         if (kind && !this.smask && !this.mask && drawWidth === originalWidth && drawHeight === originalHeight) {
           imgData.kind = kind;
           imgArray = this.getImageBytes(originalHeight * rowBytes);
@@ -33243,12 +33261,14 @@ var PDFImage = function PDFImageClosure() {
           }
           return imgData;
         }
+
         if (this.image instanceof _stream.JpegStream && !this.smask && !this.mask && (this.colorSpace.name === 'DeviceGray' || this.colorSpace.name === 'DeviceRGB' || this.colorSpace.name === 'DeviceCMYK')) {
           imgData.kind = _util.ImageKind.RGB_24BPP;
           imgData.data = this.getImageBytes(originalHeight * rowBytes, drawWidth, drawHeight, true);
           return imgData;
         }
       }
+
       imgArray = this.getImageBytes(originalHeight * rowBytes);
       var actualHeight = 0 | imgArray.length / rowBytes * drawHeight / originalHeight;
       var comps = this.getComponents(imgArray);
@@ -33272,6 +33292,10 @@ var PDFImage = function PDFImageClosure() {
       if (maybeUndoPreblend) {
         this.undoPreblend(imgData.data, drawWidth, actualHeight);
       }
+
+      // debugger;
+
+      // TODO: 签章图片的 imgData 
       return imgData;
     },
     fillGrayBuffer: function PDFImage_fillGrayBuffer(buffer) {

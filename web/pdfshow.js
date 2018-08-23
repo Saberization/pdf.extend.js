@@ -1352,6 +1352,7 @@ var pdfJsApi;
           newScale = Math.min(_ui_utils.MAX_SCALE, newScale);
         } while (--ticks > 0 && newScale < _ui_utils.MAX_SCALE);
         this.pdfViewer.currentScaleValue = newScale;
+        signInfo.scale = newScale;
       },
       zoomOut: function zoomOut(ticks) {
         var newScale = this.pdfViewer.currentScale;
@@ -1361,6 +1362,7 @@ var pdfJsApi;
           newScale = Math.max(_ui_utils.MIN_SCALE, newScale);
         } while (--ticks > 0 && newScale > _ui_utils.MIN_SCALE);
         this.pdfViewer.currentScaleValue = newScale;
+        signInfo.scale = newScale;
       },
 
       get pagesCount() {
@@ -1947,7 +1949,7 @@ var pdfJsApi;
         eventBus.on('zoomin', webViewerZoomIn);
         eventBus.on('zoomout', webViewerZoomOut);
         eventBus.on('pagenumberchanged', webViewerPageNumberChanged);
-        pdfJsApi.pageNumberNavitorTo = function(value) {
+        pdfJsApi.pageNumberNavitorTo = function (value) {
           webViewerPageNumberNavitorTo(value);
         };
         eventBus.on('scalechanged', webViewerScaleChanged);
@@ -2108,11 +2110,12 @@ var pdfJsApi;
       var queryString = document.location.search.substring(1);
       var params = (0, _ui_utils.parseQueryString)(queryString);
       //如果initData.url有值则用此url载入pdf，在页面window.onload中为其赋值
-      if (initData.url) {
-        file = initData.url;
-      } else {
-        file = 'file' in params ? params.file : appConfig.defaultUrl;
-      }
+      // if (initData.url) {
+      //   file = initData.url;
+      // } else {
+
+      // }
+      file = 'file' in params ? params.file : appConfig.defaultUrl;
       validateFileURL(file);
       var waitForBeforeOpening = [];
       var fileInput = document.createElement('input');
@@ -2210,8 +2213,7 @@ var pdfJsApi;
     }
 
     // TODO: webViewerOpenFileViaURL
-    window.webViewerOpenFileViaURL = void 0;
-    {
+    window.webViewerOpenFileViaURL = void 0; {
       webViewerOpenFileViaURL = function webViewerOpenFileViaURL(file) {
         if (file && file.lastIndexOf('file:', 0) === 0) {
           PDFViewerApplication.setTitleUsingUrl(file);
@@ -4044,7 +4046,7 @@ var pdfJsApi;
     var overlayManager = null;
 
     // TODO: renderPage 渲染页面
-    function renderPage(activeServiceOnEntry, pdfDocument, pageNumber, size) {      
+    function renderPage(activeServiceOnEntry, pdfDocument, pageNumber, size) {
       var scratchCanvas = activeService.scratchCanvas;
       var PRINT_RESOLUTION = 150;
       var PRINT_UNITS = PRINT_RESOLUTION / 72.0;
@@ -7000,7 +7002,7 @@ var pdfJsApi;
 
           var _this = this;
           // TODO: 跳转书签
-          window.linkTo = function(text) {
+          window.linkTo = function (text) {
             for (var i = 0, len = result.length; i < len; i++) {
               var title = result[i].title;
 
@@ -7433,11 +7435,55 @@ var pdfJsApi;
           if (this.onBeforeDraw) {
             this.onBeforeDraw();
           }
+
+          var signElArray = window.signElArray,
+            scale = signInfo.scale,
+            $viewerContainer = $('#viewerContainer');
+
+          $.each(signElArray, function (i, e) {
+
+            if (e) {
+              var $el = $viewerContainer.find('[data-page-number="' + e.pageNumber + '"]'),
+                signEl = e.signEl,
+                initTop = e.top,
+                initLeft = e.left,
+                initImgWidth = e.imgWidth,
+                initImgHeight = e.imgHeight;
+
+              if (e.scale < scale) {
+                var enlargeScale = scale - e.scale;
+
+                $(signEl).css({
+                  top: initTop + initTop * enlargeScale,
+                  left: initLeft + initLeft * enlargeScale
+                });
+
+                $(signEl).find('img').css({
+                  width: initImgWidth + initImgWidth * enlargeScale,
+                  height: initImgHeight + initImgHeight * enlargeScale
+                });
+              } else if (e.scale > scale) {
+                $(signEl).css({
+                  top: initTop / e.scale * scale,
+                  left: initLeft / e.scale * scale
+                });
+
+                $(signEl).find('img').css({
+                  width: initImgWidth / e.scale * scale,
+                  height: initImgHeight / e.scale * scale
+                });
+              }
+
+              $el.append(e.signEl);
+            }
+          });
+
           return resultPromise;
         }
       }, {
         key: 'paintOnCanvas',
         value: function paintOnCanvas(canvasWrapper) {
+          // TODO: paintOnCanvas
           var renderCapability = (0, _pdfjsLib.createPromiseCapability)();
           var result = {
             promise: renderCapability.promise,
@@ -10846,8 +10892,8 @@ var pdfJsApi;
             eventBus.dispatch('presentationmode');
           });
           // TODO: 平板签章功能预留，需要重新开发
-          signatureToolbar.signPad.addEventListener('click', function() {
-            
+          signatureToolbar.signPad.addEventListener('click', function () {
+
           });
           // TODO:
           items.openFile.addEventListener('click', function () {
@@ -11319,13 +11365,13 @@ var pdfJsApi;
           download: true,
           secondaryToolbar: true
         },
-        pageNumberNavitorTo: function() {},
+        pageNumberNavitorTo: function () {},
         getCurrentPage: 1,
         getPageCount: 1,
-        openPath: function(path) {
+        openPath: function (path) {
           window.webViewerOpenFileViaURL(path);
         },
-        linkTo: function(text) {
+        linkTo: function (text) {
           window.linkTo && window.linkTo(text);
         }
       };
@@ -11414,43 +11460,43 @@ var pdfJsApi;
         val ? scaleSelect.removeAttribute('hidden') : scaleSelect.setAttribute('hidden', true);
       };
 
-      var toggleOpenFile = function(val) {
+      var toggleOpenFile = function (val) {
         var openFile = toolbar.openFile;
 
         val ? openFile.removeAttribute('hidden') : openFile.setAttribute('hidden', true);
       };
 
-      var toggleCloseFile = function(val) {
+      var toggleCloseFile = function (val) {
         var closeFile = toolbar.closeFile;
 
         val ? closeFile.removeAttribute('hidden') : closeFile.setAttribute('hidden', true);
       };
 
-      var toggleFullScreen = function(val) {
+      var toggleFullScreen = function (val) {
         var presentationModeButton = toolbar.presentationModeButton;
 
         val ? presentationModeButton.removeAttribute('hidden') : presentationModeButton.setAttribute('hidden', true);
       };
 
-      var togglePrint = function(val) {
+      var togglePrint = function (val) {
         var print = toolbar.print;
 
         val ? print.removeAttribute('hidden') : print.setAttribute('hidden', true);
       };
 
-      var toggleDownload = function(val) {
+      var toggleDownload = function (val) {
         var download = toolbar.download;
 
         val ? download.removeAttribute('hidden') : download.setAttribute('hidden', true);
       };
 
-      var toggleSecondaryToolbar = function(val) {
+      var toggleSecondaryToolbar = function (val) {
         var toggleButton = secondaryToolbar.toggleButton;
 
         val ? toggleButton.removeAttribute('hidden') : toggleButton.setAttribute('hidden', true);
       };
 
-      var toggleViewBookMark = function(val) {
+      var toggleViewBookMark = function (val) {
         var toggleViewBook = secondaryToolbar.viewBookmarkButton;
 
         val ? toggleViewBook.removeAttribute('hidden') : toggleViewBook.setAttribute('hidden', true);
@@ -11544,162 +11590,162 @@ var pdfJsApi;
           }
         },
         'viewThumbnail': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleViewThumbnail(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'viewAttachments': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleViewAttachments(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'sidebarToggle': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleSidebar(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'viewFind': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleViewFind(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'firstPage': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleFirstPage(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'lastPage': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleLastPage(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'splitToolbarButton': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleSplitToolbar(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'zoom': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleSidebar(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'scaleSelect': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleScaleSelect(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'openFile': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleOpenFile(newVal);
 
-            val = newVal; 
+            val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'closeFile': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleCloseFile(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'fullScreen': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleFullScreen(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'print': {
-          set: function(newVal) {
+          set: function (newVal) {
             togglePrint(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'download': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleDownload(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'secondaryToolbar': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleSecondaryToolbar(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'viewBookmark': {
-          set: function(newVal) {
+          set: function (newVal) {
             toggleViewBookMark(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         }

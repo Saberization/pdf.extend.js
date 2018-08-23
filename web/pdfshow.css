@@ -140,3 +140,13 @@
 .hidden {
     display: none;
 }
+
+.signpad-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -160px;
+    margin-top: -100px;
+    display:none;
+    z-index:10001
+}

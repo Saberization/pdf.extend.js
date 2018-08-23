@@ -115,6 +115,7 @@
                         <div id="toolbarViewerLeft">
                             <button id="commitsign" style="width: 75px" class="toolbarButton" tabindex="83" onclick="commitsign()">完成提交</button>
                             <button id="signPadBtn" class="toolbarButton" style="width: 75px" tabindex="82" onclick="signPadClick()">平板签字</button>
+                            <button id="multi-sign" class="toolbarButton" style="width: 75px" tabindex="81" onclick="multiSignClick()">签章</button>
                             <div class="toolbarButtonSpacer"></div>
                         </div>
                         <div id="toolbarViewerMiddle">
@@ -333,7 +334,7 @@
     <!-- outerContainer -->
     <div id="printContainer"></div>
     <!--平板签字区域-->
-    <div id="signPad" style="position: absolute;display:none;z-index:10001">
+    <div id="signPad" class="signpad-container hidden">
         <div style="background-color:#474747;background-image: url(images/texture.png),
                         linear-gradient(hsla(0,0%,32%,.99), hsla(0,0%,27%,.95));">
             <input type="button" value="签完确定" class="toolbarButton" style="width: 70px; margin-left: 3px; " onclick="signPadCommit()"
@@ -343,6 +344,19 @@
             <input type="button" value="关闭" class="toolbarButton" style="width: 40px; margin-left: 133px;" onclick="signPadClose()" />
         </div>
         <div id="signPadShow" style="width: 320px; height: 200px; border: 3px solid #474747; background-color: #e7e7e7; text-align: center;"></div>
+    </div>
+
+    <!--平板签字区域-->
+    <div id="multisignpad" class="signpad-container">
+        <div style="background-color:#474747;background-image: url(images/texture.png),
+                            linear-gradient(hsla(0,0%,32%,.99), hsla(0,0%,27%,.95));">
+            <input type="button" value="开始签章" class="toolbarButton" style="width: 70px; margin-left: 3px; " onclick="multiSignStart()"
+            />
+            <input type="button" value="清除重签" class="toolbarButton" style="width: 70px; margin-left: -5px; " onclick="signPadClear()"
+            />
+            <input type="button" value="关闭" class="toolbarButton" style="width: 40px; margin-left: 133px;" onclick="multiSignClose()" />
+        </div>
+        <div id="multisignpadshow" style="width: 320px; height: 200px; border: 3px solid #474747; background-color: #e7e7e7; text-align: center;"></div>
     </div>
     <div id="delsigndiv">
         <ul>
@@ -376,196 +390,156 @@
 
     <script src="./util.js"></script>
     <script src="./pdfshow.js"></script>
+    <script src="./showcase.js"></script>
     <script type="text/javascript">
-        var pdfJsApi = {
-            /**
-             * 获取上传路径
-             * @param {String} path 上传路径
-             * 必须开启 工具 -> Internet选项 -> 安全 -> 自定义级别 -> 找到“其他”中的“将本地文件上载至服务器时包含本地目录路径”
-             * 
-             * pageNumberNavitorTo 跳转对应页面
-             * getCurrentPage
-             * getPageCount
-             * openPath http://192.168.118.28:8082/pdf.extend.js/signed_dest.pdf
-             * linkTo
-             */
-            getFilePath: function (path) {
-                // console.log(path);
-            },
-
-            tools: {
-                viewOutline: true,
-                viewThumbnail: true,
-                viewAttachments: true,
-                sidebarToggle: true,
-                viewFind: true,
-                firstPage: true,
-                lastPage: true,
-                splitToolbarButton: true,
-                zoom: true,
-                scaleSelect: true,
-                openFile: true,
-                closeFile: true,
-                fullScreen: true,
-                print: true,
-                download: true,
-                secondaryToolbar: true,
-                viewBookmark: false
-            },
-
-            getNetWorkPath: function(path) {
-                console.log(path);
-            }
-        };
-
-        var delsigndiv = document.getElementById("delsigndiv");
+        // var delsigndiv = document.getElementById("delsigndiv");
         var signInfo = {
             pwname: '',
             signtype: ''
         };
-        var initData = {};
+        // var initData = {};
 
-        window.onload = function () {
-            $("#signPad").css("margin-left", (document.body.offsetWidth / 2) - 160 + "px");
-            $("#signPad").css("margin-top", -(document.body.offsetHeight / 2) - 100 + "px");
-            //初始化
-            //initData.url = 'http://localhost/html5pdf/web/1a38d661-ddb2-4f02-b08b-589dfdfaf6c0.pdf';
-            initData.PDFAuthor = 'test';
-            document.onclick = function (e) {
-                delsigndiv.style.display = 'none';
-            };
-            //删除章
-            $('#delsign').on('click', function (e) {
-                signInfo.sign_.remove();
-                delete signInfo.sign_;
-            });
-        }
-        //载入完成后事件
-        $(document).on('loadover', function () {
-            //alert('loadover!')
-            //pdf总页数
-            //console.log("PDF总页数:"+PDFViewerApplication.pdfViewer.pagesCount);
-            //当前页
-            //console.log("当前页:"+PDFViewerApplication.page);
-            //跳转到指定页
-            //PDFViewerApplication.pdfLinkService.navigateTo([100,{name:'Fit'}]);
-        });
+        // window.onload = function () {
+        //     $("#signPad").css("margin-left", (document.body.offsetWidth / 2) - 160 + "px");
+        //     $("#signPad").css("margin-top", -(document.body.offsetHeight / 2) - 100 + "px");
+        //     //初始化
+        //     //initData.url = 'http://localhost/html5pdf/web/1a38d661-ddb2-4f02-b08b-589dfdfaf6c0.pdf';
+        //     initData.PDFAuthor = 'test';
+        //     document.onclick = function (e) {
+        //         delsigndiv.style.display = 'none';
+        //     };
+        //     //删除章
+        //     $('#delsign').on('click', function (e) {
+        //         signInfo.sign_.remove();
+        //         delete signInfo.sign_;
+        //     });
+        // }
+        // //载入完成后事件
+        // $(document).on('loadover', function () {
+        //     //alert('loadover!')
+        //     //pdf总页数
+        //     //console.log("PDF总页数:"+PDFViewerApplication.pdfViewer.pagesCount);
+        //     //当前页
+        //     //console.log("当前页:"+PDFViewerApplication.page);
+        //     //跳转到指定页
+        //     //PDFViewerApplication.pdfLinkService.navigateTo([100,{name:'Fit'}]);
+        // });
 
-        //盖章动作
-        //signtype为测试盖章，1：模拟测试盖章；2：根据signimg正式盖章
-        //pwname为评委定位标识
-        function SignToPDF(signtype, pwname, signimg) {
-            //已签过章
-            if (signInfo.sign_) {
-                alert("已签字！");
-                return;
-            }
-            signInfo.pwname = pwname;
-            signInfo.signtype = signtype;
+        // //盖章动作
+        // //signtype为测试盖章，1：模拟测试盖章；2：根据signimg正式盖章
+        // //pwname为评委定位标识
+        // function SignToPDF(signtype, pwname, signimg) {
+        //     //已签过章
+        //     if (signInfo.sign_) {
+        //         alert("已签字！");
+        //         return;
+        //     }
+        //     signInfo.pwname = pwname;
+        //     signInfo.signtype = signtype;
 
-            //签章对象
-            var sign_ = document.createElement('div');
-            sign_.id = "sign_" + pwname;
+        //     //签章对象
+        //     var sign_ = document.createElement('div');
+        //     sign_.id = "sign_" + pwname;
 
-            //签章图片
-            var img_ = document.createElement('img');
-            img_.id = "qyz";
-            if (signtype == "1") {
-                //这种是固定测试章的，调整好后此逻辑可砍掉
-                img_.src = "企业章.png";
-            } else if (signtype == "2") {
-                img_.src = "data:image/png;base64," + signimg;
-            }
-            sign_.appendChild(img_);
-            signInfo.sign_ = sign_;
+        //     //签章图片
+        //     var img_ = document.createElement('img');
+        //     img_.id = "qyz";
+        //     if (signtype == "1") {
+        //         //这种是固定测试章的，调整好后此逻辑可砍掉
+        //         img_.src = "企业章.png";
+        //     } else if (signtype == "2") {
+        //         img_.src = "data:image/png;base64," + signimg;
+        //     }
+        //     sign_.appendChild(img_);
+        //     signInfo.sign_ = sign_;
 
-            //找到标签guid，定位图片
-            $(".textLayer").each(function () {
-                if ($(this).html().indexOf(pwname) != -1) {
+        //     //找到标签guid，定位图片
+        //     $(".textLayer").each(function () {
+        //         if ($(this).html().indexOf(pwname) != -1) {
 
-                    $(this).append(sign_);
-                }
-            });
+        //             $(this).append(sign_);
+        //         }
+        //     });
 
-            //章的大小，根据百分比放大或缩小
-            var signwidth = $("#qyz").css("width").replace("px", "");
-            signInfo.signwidth = signwidth;
+        //     //章的大小，根据百分比放大或缩小
+        //     var signwidth = $("#qyz").css("width").replace("px", "");
+        //     signInfo.signwidth = signwidth;
 
-            //计算图片的位移
-            var img_left = "0px";
-            var img_top = "0px";
-            $("div :contains('" + pwname + "')").each(function () {
-                if ($(this).html() == pwname) {
-                    //这个是章对于标识的位置偏移计算，需要评标系统适当调整
-                    img_top = ($(this).css("top").replace("px", "") - signwidth * signInfo.scale / 2) + "px";
-                    img_left = ($(this).css("left").replace("px", "") - signwidth * signInfo.scale / 2) + "px";
-                }
-            })
-            //设置签章位置和大小
-            $("#qyz").css({
-                width: signwidth * signInfo.scale + "px"
-            });
-            $("#" + sign_.id).css({
-                top: img_top,
-                left: img_left
-            });
-            //绑定右击菜单
-            signInfo.sign_.oncontextmenu = function (ev) {
-                var delsigndiv = document.getElementById("delsigndiv");
+        //     //计算图片的位移
+        //     var img_left = "0px";
+        //     var img_top = "0px";
+        //     $("div :contains('" + pwname + "')").each(function () {
+        //         if ($(this).html() == pwname) {
+        //             //这个是章对于标识的位置偏移计算，需要评标系统适当调整
+        //             img_top = ($(this).css("top").replace("px", "") - signwidth * signInfo.scale / 2) + "px";
+        //             img_left = ($(this).css("left").replace("px", "") - signwidth * signInfo.scale / 2) + "px";
+        //         }
+        //     })
+        //     //设置签章位置和大小
+        //     $("#qyz").css({
+        //         width: signwidth * signInfo.scale + "px"
+        //     });
+        //     $("#" + sign_.id).css({
+        //         top: img_top,
+        //         left: img_left
+        //     });
+        //     //绑定右击菜单
+        //     signInfo.sign_.oncontextmenu = function (ev) {
+        //         var delsigndiv = document.getElementById("delsigndiv");
 
-                var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-                delsigndiv.style.display = "block";
-                delsigndiv.style.left = ev.clientX + "px";
-                //当滑动滚动条时也能准确获取菜单位置
-                delsigndiv.style.top = ev.clientY + scrollTop + "px";
-                //阻止默认事件
-                return false;
-            };
+        //         var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        //         delsigndiv.style.display = "block";
+        //         delsigndiv.style.left = ev.clientX + "px";
+        //         //当滑动滚动条时也能准确获取菜单位置
+        //         delsigndiv.style.top = ev.clientY + scrollTop + "px";
+        //         //阻止默认事件
+        //         return false;
+        //     };
 
-        }
+        // }
 
-        //============================================平板签字事件========================================================//
-        function signPadClick() {
-            $("#slade").show();
-            $("#signPad").css("display", "block");
-            $("#signPadShow").append("<img id='testsign' src='企业章.png' />");
-            //如上只是demo示意，对于平板反馈的base64，需要使用如下方式加载
-            //$("#signPadShow").append("<img id='qyz' src='" + "data:image/png;base64," + 放签字图片的base64 + "' />");
-        }
+        // /**
+        //  * 签字
+        //  */
+        // function multiSign() {
+        //     $("#slade").show();
+        //     $("#signPad").css("display", "block");
+        //     $("#signPadShow").append("<img id='testsign' src='company.png' />");
+        //     //如上只是demo示意，对于平板反馈的base64，需要使用如下方式加载
+        //     //$("#signPadShow").append("<img id='qyz' src='" + "data:image/png;base64," + 放签字图片的base64 + "' />");
+        // }
 
-        //确认盖章，然后进行指定位置盖章动作,关闭窗体
-        function signPadCommit() {
-            SignToPDF("1", "pwqz_81");
-            alert("TODO，测试显示，请看代码注释修改签字图片来源");
-            //这个只是测试盖章，真正逻辑应该如下， 上面的注释掉
-            //SignToPDF("2", "传入评委定位标识","传入获取到的签字图片base64");
+        // //确认盖章，然后进行指定位置盖章动作,关闭窗体
+        // function signPadCommit() {
+        //     SignToPDF("1", "pwqz_81");
+        //     alert("TODO，测试显示，请看代码注释修改签字图片来源");
+        //     //这个只是测试盖章，真正逻辑应该如下， 上面的注释掉
+        //     //SignToPDF("2", "传入评委定位标识","传入获取到的签字图片base64");
 
-            //移除掉signPad上的图片
-            $("#signPadShow img").remove();
-            $("#signPad").css("display", "none");
-            $("#slade").hide();
-        }
+        //     //移除掉signPad上的图片
+        //     $("#signPadShow img").remove();
+        //     $("#signPad").css("display", "none");
+        //     $("#slade").hide();
+        // }
 
-        //平板签字清除重签事件
-        function signPadClear() {
-            $("#signPadShow img").remove();
-            alert("TODO，发起与平板的交互指令，并等待新的签字");
-        }
+        // //平板签字清除重签事件
+        // function signPadClear() {
+        //     $("#signPadShow img").remove();
+        //     alert("TODO，发起与平板的交互指令，并等待新的签字");
+        // }
 
-        //平板签字关闭事件
-        function signPadClose() {
-            $("#signPadShow img").remove();
-            $("#signPad").css("display", "none");
-            $("#slade").hide();
-        }
+        // //平板签字关闭事件
+        // function signPadClose() {
+        //     $("#signPadShow img").remove();
+        //     $("#signPad").css("display", "none");
+        //     $("#slade").hide();
+        // }
 
-        //完成提交事件
-        function commitsign() {
-            alert("完成提交");
-        }
-        //============================================平板签字显示========================================================//
-
-        window.pdfJsApi = pdfJsApi;
+        // //完成提交事件
+        // function commitsign() {
+        //     alert("完成提交");
+        // }
+        // //============================================平板签字显示========================================================//
     </script>
 </body>
 
