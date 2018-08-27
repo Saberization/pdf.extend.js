@@ -8772,6 +8772,7 @@ var pdfJsApi;
           }, function (error) {
             finishRenderTask(error);
           });
+
           return renderCapability.promise;
         }
       }, {
@@ -8784,6 +8785,7 @@ var pdfJsApi;
           if (!img) {
             return;
           }
+
           if (!this.pdfPage) {
             this.setPdfPage(pageView.pdfPage);
           }
@@ -8803,6 +8805,7 @@ var pdfJsApi;
             reducedWidth >>= 1;
             reducedHeight >>= 1;
           }
+
           reducedImageCtx.drawImage(img, 0, 0, img.width, img.height, 0, 0, reducedWidth, reducedHeight);
           while (reducedWidth > 2 * canvas.width) {
             reducedImageCtx.drawImage(reducedImage, 0, 0, reducedWidth, reducedHeight, 0, 0, reducedWidth >> 1, reducedHeight >> 1);
