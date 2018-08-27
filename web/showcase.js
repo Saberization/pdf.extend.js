@@ -63,7 +63,8 @@
         _div,
         signSerial = 0,
         signElArray = [],
-        signImgArr = [],
+        newRotation = 0,
+        signatureSection = [],
         delSerial;
 
     var toolbarHeight = $('#toolbarContainer').height();
@@ -230,6 +231,7 @@
         multiSignClose,
         multiSignStart,
         signElArray,
-        signImgArr
+        newRotation,
+        signatureSection
     }
 }));

@@ -1904,11 +1904,14 @@ var pdfJsApi;
         if (!this.pdfDocument) {
           return;
         }
+
         var pdfViewer = this.pdfViewer,
           pdfThumbnailViewer = this.pdfThumbnailViewer;
 
         var pageNumber = pdfViewer.currentPageNumber;
         var newRotation = (pdfViewer.pagesRotation + 360 + delta) % 360;
+        
+        window.newRotation = newRotation;
         pdfViewer.pagesRotation = newRotation;
         pdfThumbnailViewer.pagesRotation = newRotation;
         this.forceRendering();
@@ -7439,7 +7442,8 @@ var pdfJsApi;
 
           var signElArray = window.signElArray,
             scale = signInfo.scale,
-            $viewerContainer = $('#viewerContainer');
+            $viewerContainer = $('#viewerContainer'),
+            rotation = window.newRotation;
 
           $.each(signElArray, function (i, e) {
 
@@ -7449,31 +7453,55 @@ var pdfJsApi;
                 initTop = e.top,
                 initLeft = e.left,
                 initImgWidth = e.imgWidth,
-                initImgHeight = e.imgHeight;
+                initImgHeight = e.imgHeight,
+                $signEl = $(signEl),
+                $img = $signEl.find('img'),
+                width,
+                height,
+                top,
+                left;
 
               if (e.scale < scale) {
                 var enlargeScale = scale - e.scale;
 
-                $(signEl).css({
-                  top: initTop + initTop * enlargeScale,
-                  left: initLeft + initLeft * enlargeScale
+                top = initTop + initTop * enlargeScale;
+                left = initLeft + initLeft * enlargeScale;
+                width = initImgWidth + initImgWidth * enlargeScale;
+                height = initImgHeight + initImgHeight * enlargeScale;
+
+                $img.css({
+                  width: width,
+                  height: height
                 });
 
-                $(signEl).find('img').css({
-                  width: initImgWidth + initImgWidth * enlargeScale,
-                  height: initImgHeight + initImgHeight * enlargeScale
+                $signEl.css({
+                  top: top,
+                  left: left
                 });
+
               } else if (e.scale > scale) {
-                $(signEl).css({
-                  top: initTop / e.scale * scale,
-                  left: initLeft / e.scale * scale
-                });
+                top = initTop / e.scale * scale;
+                left = initLeft / e.scale * scale;
+                width = initImgWidth / e.scale * scale;
+                height = initImgHeight / e.scale * scale;
 
-                $(signEl).find('img').css({
-                  width: initImgWidth / e.scale * scale,
-                  height: initImgHeight / e.scale * scale
+                $img.css({
+                  width: width,
+                  height: height
                 });
               }
+
+              // switch (rotation) {
+              //   case 0:
+              //     $signEl.css({
+              //       top: top,
+              //       left: left
+              //     });
+              //     break;
+
+              //   case 90:
+              //     break;
+              // }
 
               $el.append(e.signEl);
             }
@@ -10930,6 +10958,9 @@ var pdfJsApi;
 
             outlineView.innerHTML = '';
             thumbnailView.innerHTML = '';
+            window.signElArray = [];
+            window.newRotation = [];
+            window.signatureSection = [];
           });
           items.print.addEventListener('click', function () {
             eventBus.dispatch('print');
