@@ -17144,6 +17144,7 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
       }
       return glyphs;
     },
+    // 这里貌似是渲染
     setGState: function PartialEvaluator_setGState(resources, gState, operatorList, task, stateManager) {
       var _this6 = this;
 
@@ -19574,8 +19575,6 @@ var QueueOptimizer = function QueueOptimizerClosure() {
       }
     }
 
-    console.log(offset);
-    console.log(map);
     fnArray.splice(iFirstSave, count * 4, _util.OPS.paintInlineImageXObjectGroup);
     argsArray.splice(iFirstSave, count * 4, [{
       width: imgWidth,
@@ -27847,8 +27846,6 @@ var WidgetAnnotation = function WidgetAnnotationClosure() {
     }
     data.readOnly = this.hasFieldFlag(_util.AnnotationFieldFlag.READONLY);
 
-    console.log(data);
-
     if (data.fieldType === 'Sig') {
       // TODO: 显示数字签名
       // this.setFlags(_util.AnnotationFlag.HIDDEN);
@@ -29281,7 +29278,6 @@ var Page = function PageClosure() {
     },
     // TODO: 渲染签章的地方
     getOperatorList: function getOperatorList(_ref) {
-      console.log(_ref);
       var _this2 = this;
 
       var handler = _ref.handler,

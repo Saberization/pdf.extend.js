@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+var signatureCount = 0;
+
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -7319,6 +7321,7 @@ var SVGGraphics = function SVGGraphics() {
       },
       executeOpTree: function SVGGraphics_executeOpTree(opTree) {
         var opTreeLen = opTree.length;
+
         for (var x = 0; x < opTreeLen; x++) {
           var fn = opTree[x].fn;
           var fnId = opTree[x].fnId;
@@ -14446,6 +14449,7 @@ FontLoader.prototype = {
       ctx.font = '30px ' + name;
       ctx.fillText('.', 0, 20);
       var imageData = ctx.getImageData(0, 0, 1, 1);
+
       if (imageData.data[3] > 0) {
         callback();
         return;
@@ -14909,6 +14913,7 @@ var CanvasExtraState = function CanvasExtraStateClosure() {
 var CanvasGraphics = function CanvasGraphicsClosure() {
   var EXECUTION_TIME = 15;
   var EXECUTION_STEPS = 10;
+  // TODO: CanvasGraphics
   function CanvasGraphics(canvasCtx, commonObjs, objs, canvasFactory, imageLayer) {
     this.ctx = canvasCtx;
     this.current = new CanvasExtraState();
@@ -14935,6 +14940,7 @@ var CanvasGraphics = function CanvasGraphicsClosure() {
     }
     this.cachedGetSinglePixelWidth = null;
   }
+  // TODO: ImageData
   function putBinaryImageData(ctx, imgData) {
     if (typeof ImageData !== 'undefined' && imgData instanceof ImageData) {
       ctx.putImageData(imgData, 0, 0);
@@ -14999,6 +15005,7 @@ var CanvasGraphics = function CanvasGraphicsClosure() {
       for (i = 0; i < fullChunks; i++) {
         dest.set(src.subarray(srcPos, srcPos + elemsInThisChunk));
         srcPos += elemsInThisChunk;
+        // TODO: 这里渲染图章的
         ctx.putImageData(chunkImgData, 0, j);
         j += FULL_CHUNK_HEIGHT;
       }
@@ -16203,6 +16210,7 @@ var CanvasGraphics = function CanvasGraphicsClosure() {
       }
       this.paintInlineImageXObjectGroup(imgData, map);
     },
+    // TODO: paintInlineImageXObject
     paintInlineImageXObject: function CanvasGraphics_paintInlineImageXObject(imgData) {
       var width = imgData.width;
       var height = imgData.height;
@@ -16248,7 +16256,43 @@ var CanvasGraphics = function CanvasGraphicsClosure() {
         paintHeight = newHeight;
         tmpCanvasId = tmpCanvasId === 'prescale1' ? 'prescale2' : 'prescale1';
       }
+
       ctx.drawImage(imgToPaint, 0, 0, paintWidth, paintHeight, 0, -height, width, height);
+
+      // TODO: 这里是真正绘制签章的地方。
+      var position = this.getCanvasPosition(0, -height),
+        positionLeft = position[0] / 2,
+        positionTop = position[1] / 2,
+        positionWidth = width / currentTransform[0] / 2,
+        positionHeight = height / currentTransform[3] / 2,
+        pageId = this.ctx.canvas.id;
+
+      pageId = parseInt(pageId.replace('page', ''), 10);
+
+      // TODO: 设置类遮罩！
+      var div = document.createElement('div');
+
+      $(div).addClass('signature');
+      $(div).css({
+        position: 'absolute',
+        left: positionLeft,
+        top: positionTop,
+        width: positionWidth,
+        height: positionHeight
+      });
+
+      $(div).hover(function() {
+        $(this).css({
+          border: '2px dashed rgba(173, 173, 173)'
+        });
+      }, function() {
+        $(this).css({
+          border: 0
+        });
+      });
+
+      $('#viewerContainer').find('[data-page-number="' + pageId + '"]').append($(div));
+
       if (this.imageLayer) {
         var position = this.getCanvasPosition(0, -height);
         this.imageLayer.appendImage({
@@ -16259,6 +16303,7 @@ var CanvasGraphics = function CanvasGraphicsClosure() {
           height: height / currentTransform[3]
         });
       }
+
       this.restore();
     },
     paintInlineImageXObjectGroup: function CanvasGraphics_paintInlineImageXObjectGroup(imgData, map) {
@@ -16329,6 +16374,7 @@ var CanvasGraphics = function CanvasGraphicsClosure() {
   for (var op in _util.OPS) {
     CanvasGraphics.prototype[_util.OPS[op]] = CanvasGraphics.prototype[op];
   }
+  
   return CanvasGraphics;
 }();
 exports.CanvasGraphics = CanvasGraphics;

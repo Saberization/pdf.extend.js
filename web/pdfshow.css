@@ -147,3 +147,7 @@
     display:none;
     z-index:10001
 }
+
+.signature {
+    cursor: pointer;
+}

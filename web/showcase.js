@@ -41,7 +41,9 @@
             print: true,
             download: true,
             secondaryToolbar: true,
-            viewBookmark: false
+            viewBookmark: false,
+            pageRotateCw: true,
+            pageRotateCcw: true
         },
 
         getNetWorkPath: function (path) {
@@ -61,6 +63,7 @@
         _div,
         signSerial = 0,
         signElArray = [],
+        signImgArr = [],
         delSerial;
 
     var toolbarHeight = $('#toolbarContainer').height();
@@ -226,6 +229,7 @@
         multiSignClick,
         multiSignClose,
         multiSignStart,
-        signElArray
+        signElArray,
+        signImgArr
     }
 }));

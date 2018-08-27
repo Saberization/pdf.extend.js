@@ -1899,6 +1899,7 @@ var pdfJsApi;
         }
         this.forceRendering();
       },
+      // TODO: rotatePages 旋转页面
       rotatePages: function rotatePages(delta) {
         if (!this.pdfDocument) {
           return;
@@ -10306,6 +10307,7 @@ var pdfJsApi;
                 for (var property in eventDetails) {
                   details[property] = eventDetails[property];
                 }
+                console.log(eventName, details);
                 _this.eventBus.dispatch(eventName, details);
               }
               if (close) {
@@ -10858,8 +10860,6 @@ var pdfJsApi;
             items = this.items,
             signatureToolbar = appConfig.signatureToolbar;
 
-          console.log(PDFViewerApplication);
-
           var self = this;
           items.previous.addEventListener('click', function () {
             eventBus.dispatch('previouspage');
@@ -11366,7 +11366,9 @@ var pdfJsApi;
           fullScreen: true,
           print: true,
           download: true,
-          secondaryToolbar: true
+          secondaryToolbar: true,
+          pageRotateCw: true,
+          pageRotateCcw: true
         },
         pageNumberNavitorTo: function () {},
         getCurrentPage: 1,
@@ -11505,6 +11507,18 @@ var pdfJsApi;
         val ? toggleViewBook.removeAttribute('hidden') : toggleViewBook.setAttribute('hidden', true);
       };
 
+      var togglePageRotateCw = function(val) {
+        var togglePageRotateCw = secondaryToolbar.pageRotateCwButton;
+
+        val ? togglePageRotateCw.removeAttribute('hidden') : togglePageRotateCw.setAttribute('hidden', true);
+      };
+
+      var togglePageRotateCcw = function(val) {
+        var togglePageRotateCcw = secondaryToolbar.pageRotateCcwButton;
+
+        val ? togglePageRotateCcw.removeAttribute('hidden') : togglePageRotateCcw.setAttribute('hidden', true);
+      };
+
       // 初始化处理所有按钮
       for (var k in tools) {
         var itemVal = tools[k];
@@ -11576,6 +11590,14 @@ var pdfJsApi;
 
           case 'viewBookmark':
             toggleViewBookMark(itemVal);
+            break;
+
+          case 'pageRotateCw':
+            togglePageRotateCw(itemVal);
+            break;
+
+          case 'pageRotateCcw':
+            togglePageRotateCcw(itemVal);
             break;
         }
       }
@@ -11749,6 +11771,26 @@ var pdfJsApi;
             val = newVal;
           },
           get: function () {
+            return val;
+          }
+        },
+        'pageRotateCw': {
+          set: function(newVal) {
+            togglePageRotateCw(newVal);
+
+            val = newVal;
+          },
+          get: function() {
+            return val;
+          }
+        },
+        'pageRotateCcw': {
+          set: function(newVal) {
+            togglePageRotateCcw(newVal);
+
+            val = newVal;
+          },
+          get: function() {
             return val;
           }
         }
