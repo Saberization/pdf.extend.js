@@ -1912,6 +1912,7 @@ var pdfJsApi;
         var newRotation = (pdfViewer.pagesRotation + 360 + delta) % 360;
 
         window.newRotation = newRotation;
+        window.signNameArrayIndex = 0;
         pdfViewer.pagesRotation = newRotation;
         pdfThumbnailViewer.pagesRotation = newRotation;
         this.forceRendering();
@@ -2239,6 +2240,11 @@ var pdfJsApi;
         if (file) {
           PDFViewerApplication.open(file);
           verify(file);
+
+          window.signElArray = [];
+          window.newRotation = 0;
+          window.signNameArray = [];
+          window.signNameArrayIndex = 0;
           pdfJsApi.getNetWorkPath && pdfJsApi.getNetWorkPath.call(pdfJsApi, file);
         }
       };
@@ -2440,6 +2446,11 @@ var pdfJsApi;
         appConfig.secondaryToolbar.viewBookmarkButton.setAttribute('hidden', 'true');
         appConfig.toolbar.download.setAttribute('hidden', 'true');
         appConfig.secondaryToolbar.downloadButton.setAttribute('hidden', 'true');
+
+        window.signElArray = [];
+        window.newRotation = 0;
+        window.signNameArray = [];
+        window.signNameArrayIndex = 0;
 
         // TODO: 获取签章信息
         verify(file);

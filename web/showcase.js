@@ -213,7 +213,12 @@
             });
         }).on('click', '._signature', function() {
             var signid = $(this).data('signid'),
-                responseSignData = window.responseSignData;
+                responseSignData = window.responseSignData || [];
+
+            if (responseSignData.length < 1) {
+                alert('暂无此签章信息');
+                return;
+            }
 
             $.each(responseSignData, function(i, e) {
                 if (e.signid == signid) {
