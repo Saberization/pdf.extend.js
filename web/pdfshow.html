@@ -10,6 +10,7 @@
     <title>pdfshow</title>
     <link rel="stylesheet" href="viewer.css" />
     <link rel="stylesheet" href="pdfshow.css" />
+    <link rel="stylesheet" href="../build/animate.min.css">
     <link rel="resource" type="application/l10n" href="locale/locale.properties" />
     <script src="../Scripts/jquery-1.7.1.min.js"></script>
     <script src="../build/pdf.js"></script>
@@ -388,6 +389,90 @@
         </div>
     </div>
 
+    <!-- 签章信息展示区域 -->
+    <div class="ui-popup hidden" id="ui-popup">
+        <div class="ui-popup-header">
+            <button class="ui-popup-close">x</button>
+            <div class="ui-popup-title">数字签名</div>
+        </div>
+
+        <div class="ui-popup-body">
+            <div class="ui-popup-content" id="ui-popup-content">
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- template -->
+    <script type="text/template" id="tpl-uipopup">
+        <div>
+            <div class="ep-title {{signCls}}">
+                <i class="ep-icon"></i>
+                <span>{{signDescription}}</span>
+            </div>
+        </div>
+
+        <div class="ep-content">
+            <div class="ep-tab">
+                <ul class="ep-nav clearfix">
+                    <li class="active">
+                        <a href="javascript:void(0);">签名信息</a>
+                    </li>
+                </ul>
+
+                <div class="ep-tab--content">
+                    <div class="ep-tab-pane active certinfo">
+                        <div class="ep-meta">
+                            <div class="ep-item clearfix">
+                                <label class="ep-label">原因：</label>
+                                <span class="ep-value">
+                                    {{reason}}
+                                </span>
+                            </div>
+
+                            <div class="ep-item clearfix">
+                                <label class="ep-label">签名日期：</label>
+                                <span class="ep-value">
+                                    {{signdate}}
+                                </span>
+                            </div>
+
+                            <div class="ep-item clearfix">
+                                <label class="ep-label">签名者：</label>
+                                <span class="ep-value">
+                                    {{cert.signer}}
+                                    <a href="{{cert.certDownloadUrl}}" download class="ep-a-cert">下载证书</a>
+                                </span>
+                            </div>
+
+                            <div class="ep-item clearfix">
+                                <label class="ep-label" style="width: 17%">证书序列号：</label>
+                                <span class="ep-value" style="width: 83%">
+                                    {{cert.serialNumber}}
+                                </span>
+                            </div>
+
+                            <div class="ep-item clearfix">
+                                <label class="ep-label">签名算法：</label>
+                                <span class="ep-value">
+                                    {{cert.sigAlg}}
+                                </span>
+                            </div>
+
+                            <div class="ep-item clearfix">
+                                <label class="ep-label">位置：</label>
+                                <span class="ep-value">
+                                    {{location}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script src="../build/mustache.min.js"></script>
     <script src="./util.js"></script>
     <script src="./pdfshow.js"></script>
     <script src="./showcase.js"></script>

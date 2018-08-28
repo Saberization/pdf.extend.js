@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+var firstPositionWidth = 0,
+  firstPositionHeight = 0;
+
 (function webpackUniversalModuleDefinition(root, factory) {
   if (typeof exports === 'object' && typeof module === 'object')
     module.exports = factory();
@@ -17054,86 +17057,75 @@
               positionTop = position[1] / 2,
               positionWidth = width / currentTransform[0] / 2,
               positionHeight = height / currentTransform[3] / 2,
-              pageId = this.ctx.canvas.id;
+              pageId = this.ctx.canvas.id,
+              signNameArray = window.signNameArray;
 
             pageId = parseInt(pageId.replace('page', ''), 10);
 
+            var div = document.createElement('div');
+
+            $(div).addClass('_signature');
+            $(div).hover(function () {
+              $(this).css({
+                border: '2px dashed rgba(173, 173, 173)'
+              });
+            }, function () {
+              $(this).css({
+                border: 0
+              });
+            });
+
+            $(div).css({
+              position: 'absolute',
+              cursor: 'pointer'
+            });
+
+            $(div).attr('data-signid', signNameArray[window.signNameArrayIndex]);
+
+            window.signNameArrayIndex++;
+
             switch (window.newRotation) {
               case 0:
-                window.signatureSection = [];
-                // TODO: 设置类遮罩！
-                var div = document.createElement('div');
+                firstPositionWidth = positionWidth;
+                firstPositionHeight = positionHeight;
 
-                $(div).addClass('_signature');
                 $(div).css({
-                  position: 'absolute',
                   left: positionLeft,
                   top: positionTop,
                   width: positionWidth,
-                  height: positionHeight,
-                  cursor: 'pointer'
+                  height: positionHeight
                 });
-
-                $(div).hover(function () {
-                  $(this).css({
-                    border: '2px dashed rgba(173, 173, 173)'
-                  });
-                }, function () {
-                  $(this).css({
-                    border: 0
-                  });
-                });
-
-                window.signatureSection.push({
-                  pageId: pageId,
-                  el: div,
-                  positionWidth: positionWidth,
-                  positionHeight: positionHeight
-                });
-
-                $('#viewerContainer').find('[data-page-number="' + pageId + '"]').append(div);
-
                 break;
 
               case 90:
-                $.each(window.signatureSection, function(i, e) {
-                  $(e.el).css({
-                    left: positionLeft - e.positionHeight,
+                $(div).css({
+                    left: positionLeft - firstPositionHeight,
                     top: positionTop,
-                    width: e.positionWidth,
-                    height: e.positionHeight
-                  });
-
-                  $('#viewerContainer').find('[data-page-number="' + e.pageId + '"]').append(e.el);
+                    width: firstPositionWidth,
+                    height: firstPositionHeight
                 });
                 break;
 
               case 180:
-                $.each(window.signatureSection, function(i, e) {
-                  $(e.el).css({
-                    left: positionLeft - e.positionWidth,
-                    top: positionTop - e.positionWidth,
-                    width: e.positionWidth,
-                    height: e.positionHeight
-                  });
-
-                  $('#viewerContainer').find('[data-page-number="' + e.pageId + '"]').append(e.el);
+                $(div).css({
+                  left: positionLeft - firstPositionWidth,
+                  top: positionTop - firstPositionWidth,
+                  width: firstPositionWidth,
+                  height: firstPositionHeight
                 });
                 break;
 
-                case 270:
-                  $.each(window.signatureSection, function(i, e) {
-                    $(e.el).css({
-                      left: positionLeft,
-                      top: positionTop - e.positionWidth,
-                      width: e.positionWidth,
-                      height: e.positionHeight
-                    });
-
-                    $('#viewerContainer').find('[data-page-number="' + e.pageId + '"]').append(e.el);
-                  });
-                  break;
+              case 270:
+                $(div).css({
+                  left: positionLeft,
+                  top: positionTop - firstPositionWidth,
+                  width: firstPositionWidth,
+                  height: firstPositionHeight
+                });
+                break;
             }
+
+            $('#viewerContainer').find('[data-page-number="' + pageId + '"]').append(div);
 
             ctx.drawImage(imgToPaint, 0, 0, paintWidth, paintHeight, 0, -height, width, height);
 

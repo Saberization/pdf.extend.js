@@ -27718,7 +27718,6 @@ var Annotation = function AnnotationClosure() {
         var objectLoader = new _obj.ObjectLoader(resources, keys, resources.xref);
 
         return objectLoader.load().then(function () {
-          console.log(resources);
           return resources;
         });
       });
@@ -27828,6 +27827,8 @@ var AnnotationBorderStyle = function AnnotationBorderStyleClosure() {
   return AnnotationBorderStyle;
 }();
 var WidgetAnnotation = function WidgetAnnotationClosure() {
+  var win = window;
+
   function WidgetAnnotation(params) {
     Annotation.call(this, params);
     var dict = params.dict;
@@ -27847,6 +27848,7 @@ var WidgetAnnotation = function WidgetAnnotationClosure() {
     data.readOnly = this.hasFieldFlag(_util.AnnotationFieldFlag.READONLY);
 
     if (data.fieldType === 'Sig') {
+      win.signNameArray.push(data.fieldName);
       // TODO: 显示数字签名
       // this.setFlags(_util.AnnotationFlag.HIDDEN);
     }

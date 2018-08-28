@@ -57,15 +57,20 @@
         $multiSignPadShow = $('#multisignpadshow'),
         $viewerContainer = $('#viewerContainer'),
         $mainContainer = $('#mainContainer'),
-        $contextmenu = $('#delsigndiv');
+        $contextmenu = $('#delsigndiv'),
+        $uiPopup = $('#ui-popup'),
+        $uiPopupContent = $('#ui-popup-content');
+
+    var $tplPopup = $('#tpl-uipopup').html();
 
     var _img,
         _div,
         signSerial = 0,
         signElArray = [],
         newRotation = 0,
-        signatureSection = [],
-        delSerial;
+        delSerial,
+        signNameArray = [],
+        signNameArrayIndex = 0;
 
     var toolbarHeight = $('#toolbarContainer').height();
 
@@ -110,6 +115,9 @@
     }
 
     function initListeners() {
+        var offsetLeft,
+            offsetTop;
+
         $viewerContainer.on('click', '.page', function () {
             var pageNumber = $(this).attr('data-page-number');
 
@@ -149,12 +157,7 @@
 
                 signSerial++;
             }
-        });
-
-        var offsetLeft,
-            offsetTop;
-
-        $viewerContainer.on('mouseenter', '.page', function (e) {
+        }).on('mouseenter', '.page', function (e) {
             var $this = $(this);
             var pageX = e.pageX,
                 pageY = e.pageY;
@@ -173,9 +176,7 @@
 
                 $this.append(_div);
             }
-        });
-
-        $viewerContainer.on('mousemove', '.page', function (e) {
+        }).on('mousemove', '.page', function (e) {
             var pageX = e.pageX,
                 pageY = e.pageY;
 
@@ -191,9 +192,7 @@
                     left: left + 'px'
                 });
             }
-        });
-
-        $viewerContainer.on('mouseleave', function (e) {
+        }).on('mouseleave', function (e) {
             var movesign = $(this).find('.movesign');
 
             $.each(movesign, function(i, e) {
@@ -202,9 +201,7 @@
 
             _div = null;
             _img = null;
-        });
-
-        $viewerContainer.on('contextmenu', '._addSign', function(e) {
+        }).on('contextmenu', '._addSign', function(e) {
             e.preventDefault();
 
             delSerial = $(this).data('index');
@@ -214,6 +211,39 @@
                 top: e.pageY,
                 left: e.pageX
             });
+        }).on('click', '._signature', function() {
+            var signid = $(this).data('signid'),
+                responseSignData = window.responseSignData;
+
+            $.each(responseSignData, function(i, e) {
+                if (e.signid == signid) {
+                    var cert = e.cert;
+
+                    if (e.isIntegrity) {
+                        e.signCls = 'success';
+                        e.signDescription = '签名有效，由"'+ cert.signer +'"签名，自应用本签名以来，"文档"未被修改';
+                    }
+                    else {
+                        e.signCls = 'error';
+                        e.signDescription = '签名无效，由"'+ + cert.signer + +'"签名，自应用本签名以来，"文档"已被更改或损坏';
+                    }
+
+                    var blob = Util.base64ToBlob(cert.base64Cert);
+
+                    cert.certDownloadUrl = window.URL.createObjectURL(blob);
+                    e.signdate = Util.getDate(e.signdate);
+
+                    $uiPopupContent.html(Mustache.render($tplPopup, e));
+                    $uiPopup.addClass('zoomIn animated faster');
+                    $uiPopup.removeClass('hidden');
+                    window.URL.revokeObjectURL(blob);
+                }
+            });
+        });
+
+        $uiPopup.on('click', '.ui-popup-close', function() {
+            $uiPopup.removeClass('zoomIn animated faster');
+            $uiPopup.addClass('hidden');
         });
 
         $contextmenu.on('click', 'li', function() {
@@ -232,6 +262,7 @@
         multiSignStart,
         signElArray,
         newRotation,
-        signatureSection
+        signNameArray,
+        signNameArrayIndex
     }
 }));

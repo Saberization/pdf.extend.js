@@ -1910,7 +1910,7 @@ var pdfJsApi;
 
         var pageNumber = pdfViewer.currentPageNumber;
         var newRotation = (pdfViewer.pagesRotation + 360 + delta) % 360;
-        
+
         window.newRotation = newRotation;
         pdfViewer.pagesRotation = newRotation;
         pdfThumbnailViewer.pagesRotation = newRotation;
@@ -2238,6 +2238,7 @@ var pdfJsApi;
         }
         if (file) {
           PDFViewerApplication.open(file);
+          verify(file);
           pdfJsApi.getNetWorkPath && pdfJsApi.getNetWorkPath.call(pdfJsApi, file);
         }
       };
@@ -2372,6 +2373,38 @@ var pdfJsApi;
         }
       }
     }
+
+    var verify = void 0; {
+      verify = function verify(file) {
+        var url = 'http://192.168.108.217:8090/pdf/verify';
+        var formData = new FormData();
+
+        if (typeof file == 'string') {
+          formData.append('type', 'url');
+          formData.append('msg', file);
+        }
+        else {
+          formData.append('file', file);
+          formData.append('type', 'file');
+        }
+
+        $.ajax({
+          url: url,
+          data: formData,
+          type: 'post',
+          processData: false,
+          contentType: false,
+          dataType: 'json',
+          success: function (res) {
+            window.responseSignData = res;
+          },
+          error: function (err) {
+            console.error('获取电子签章信息失败！');
+          }
+        });
+      }
+    }
+
     // TODO:
     var webViewerFileInputChange = void 0; {
       webViewerFileInputChange = function webViewerFileInputChange(evt) {
@@ -2407,6 +2440,9 @@ var pdfJsApi;
         appConfig.secondaryToolbar.viewBookmarkButton.setAttribute('hidden', 'true');
         appConfig.toolbar.download.setAttribute('hidden', 'true');
         appConfig.secondaryToolbar.downloadButton.setAttribute('hidden', 'true');
+
+        // TODO: 获取签章信息
+        verify(file);
       };
     }
 
@@ -7456,52 +7492,65 @@ var pdfJsApi;
                 initImgHeight = e.imgHeight,
                 $signEl = $(signEl),
                 $img = $signEl.find('img'),
-                width,
-                height,
-                top,
-                left;
+                width = initImgWidth,
+                height = initImgHeight,
+                top = initTop,
+                left = initLeft;
 
-              if (e.scale < scale) {
-                var enlargeScale = scale - e.scale;
+              var canvasWidth = $el.find('.canvasWrapper').width(),
+                canvasHeight = $el.find('.canvasWrapper').height();
 
-                top = initTop + initTop * enlargeScale;
-                left = initLeft + initLeft * enlargeScale;
-                width = initImgWidth + initImgWidth * enlargeScale;
-                height = initImgHeight + initImgHeight * enlargeScale;
+              top = initTop / e.scale * scale;
+              left = initLeft / e.scale * scale;
+              width = initImgWidth / e.scale * scale;
+              height = initImgHeight / e.scale * scale;
 
-                $img.css({
-                  width: width,
-                  height: height
-                });
+              $img.css({
+                width: width,
+                height: height
+              });
 
-                $signEl.css({
-                  top: top,
-                  left: left
-                });
+              switch (rotation) {
+                case 0:
+                  $signEl.css({
+                    top: top,
+                    left: left,
+                    bottom: 'auto',
+                    right: 'auto'
+                  });
+                  break;
 
-              } else if (e.scale > scale) {
-                top = initTop / e.scale * scale;
-                left = initLeft / e.scale * scale;
-                width = initImgWidth / e.scale * scale;
-                height = initImgHeight / e.scale * scale;
+                case 90:
+                  $signEl.css({
+                    top: left,
+                    left: 'auto',
+                    right: top,
+                    bottom: 'auto'
+                  });
+                  break;
 
-                $img.css({
-                  width: width,
-                  height: height
-                });
+                case 180:
+                  $signEl.css({
+                    top: 'auto',
+                    left: 'auto',
+                    bottom: top,
+                    right: left
+                  });
+                  break;
+
+                case 270:
+                  $signEl.css({
+                    top: 'auto',
+                    left: top,
+                    bottom: left,
+                    right: 'auto'
+                  });
+                  break;
               }
 
-              // switch (rotation) {
-              //   case 0:
-              //     $signEl.css({
-              //       top: top,
-              //       left: left
-              //     });
-              //     break;
-
-              //   case 90:
-              //     break;
-              // }
+              $signEl.css({
+                transform: 'rotate(' + rotation + 'deg)'
+              });
 
               $el.append(e.signEl);
             }
@@ -10959,8 +11008,9 @@ var pdfJsApi;
             outlineView.innerHTML = '';
             thumbnailView.innerHTML = '';
             window.signElArray = [];
-            window.newRotation = [];
-            window.signatureSection = [];
+            window.newRotation = 0;
+            window.signNameArray = [];
+            window.signNameArrayIndex = 0;
           });
           items.print.addEventListener('click', function () {
             eventBus.dispatch('print');
@@ -11538,13 +11588,13 @@ var pdfJsApi;
         val ? toggleViewBook.removeAttribute('hidden') : toggleViewBook.setAttribute('hidden', true);
       };
 
-      var togglePageRotateCw = function(val) {
+      var togglePageRotateCw = function (val) {
         var togglePageRotateCw = secondaryToolbar.pageRotateCwButton;
 
         val ? togglePageRotateCw.removeAttribute('hidden') : togglePageRotateCw.setAttribute('hidden', true);
       };
 
-      var togglePageRotateCcw = function(val) {
+      var togglePageRotateCcw = function (val) {
         var togglePageRotateCcw = secondaryToolbar.pageRotateCcwButton;
 
         val ? togglePageRotateCcw.removeAttribute('hidden') : togglePageRotateCcw.setAttribute('hidden', true);
@@ -11806,22 +11856,22 @@ var pdfJsApi;
           }
         },
         'pageRotateCw': {
-          set: function(newVal) {
+          set: function (newVal) {
             togglePageRotateCw(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         },
         'pageRotateCcw': {
-          set: function(newVal) {
+          set: function (newVal) {
             togglePageRotateCcw(newVal);
 
             val = newVal;
           },
-          get: function() {
+          get: function () {
             return val;
           }
         }
