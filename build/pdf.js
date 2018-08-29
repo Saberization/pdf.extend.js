@@ -16,6 +16,8 @@
 var firstPositionWidth = 0,
   firstPositionHeight = 0;
 
+var initScale = 0;
+
 window.signNameArrayIndex = 0;
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -15717,7 +15719,9 @@ window.signNameArrayIndex = 0;
           this.smaskCounter = 0;
           this.tempSMask = null;
           this.cachedCanvases = new CachedCanvases(this.canvasFactory);
+
           if (canvasCtx) {
+            this.pageId = canvasCtx.canvas && canvasCtx.canvas.id;
             addContextCurrentTransform(canvasCtx);
           }
           this.cachedGetSinglePixelWidth = null;
@@ -17053,20 +17057,25 @@ window.signNameArrayIndex = 0;
               tmpCanvasId = tmpCanvasId === 'prescale1' ? 'prescale2' : 'prescale1';
             }
 
+            ctx.drawImage(imgToPaint, 0, 0, paintWidth, paintHeight, 0, -height, width, height);
+
             var devicePixelRatio = window.getOutputScale(ctx) && window.getOutputScale(ctx).sx;
 
             // TODO: 这里是真正绘制签章的地方。
-            var position = this.getCanvasPosition(0, -height),
-              positionLeft = position[0] / devicePixelRatio,
-              positionTop = position[1] / devicePixelRatio,
-              positionWidth = width / currentTransform[0] / devicePixelRatio,
-              positionHeight = height / currentTransform[3] / devicePixelRatio,
-              pageId = this.ctx.canvas.id,
+            var position = ctx.canvas.id ? this.getCanvasPosition(0, -height) : this.getCanvasPosition(width * 2, height),
+              positionLeft = parseInt((position[0] / devicePixelRatio).toFixed(2), 10),
+              positionTop = parseInt((position[1] / devicePixelRatio).toFixed(2), 10),
+              positionWidth = parseInt((width / currentTransform[0] / devicePixelRatio).toFixed(2), 10) || (firstPositionWidth / initScale * signInfo.scale),
+              positionHeight = parseInt((height / currentTransform[3] / devicePixelRatio).toFixed(2), 10) || (firstPositionHeight / initScale * signInfo.scale),
+              pageId = this.pageId,
               signNameArray = window.signNameArray,
               signNameArrayIndex = window.signNameArrayIndex,
-              signEvtClickCallback = window.signEvtClickCallback;
+              signEvtClickCallback = window.signEvtClickCallback,
+              pageNumber = parseInt(pageId.replace('page', ''), 10);
 
-            pageId = parseInt(pageId.replace('page', ''), 10);
+            if (!ctx.canvas.id) {
+              positionLeft += width / 2;
+            }
 
             var div = document.createElement('div');
 
@@ -17099,10 +17108,13 @@ window.signNameArrayIndex = 0;
               div.onclick = signEvtClickCallback;
             }
 
+            console.log(positionLeft, positionTop, positionWidth, positionHeight);
+
             switch (window.newRotation) {
               case 0:
                 firstPositionWidth = positionWidth;
                 firstPositionHeight = positionHeight;
+                initScale = signInfo.scale;
 
                 $(div).css({
                   left: positionLeft,
@@ -17114,35 +17126,33 @@ window.signNameArrayIndex = 0;
 
               case 90:
                 $(div).css({
-                    left: positionLeft - firstPositionHeight,
+                    left: positionLeft - positionHeight,
                     top: positionTop,
-                    width: firstPositionWidth,
-                    height: firstPositionHeight
+                    width: positionWidth,
+                    height: positionHeight
                 });
                 break;
 
               case 180:
                 $(div).css({
-                  left: positionLeft - firstPositionWidth,
-                  top: positionTop - firstPositionWidth,
-                  width: firstPositionWidth,
-                  height: firstPositionHeight
+                  left: positionLeft - positionHeight,
+                  top: positionTop - positionWidth,
+                  width: positionWidth,
+                  height: positionHeight
                 });
                 break;
 
               case 270:
                 $(div).css({
                   left: positionLeft,
-                  top: positionTop - firstPositionWidth,
-                  width: firstPositionWidth,
-                  height: firstPositionHeight
+                  top: positionTop - positionWidth,
+                  width: positionWidth,
+                  height: positionHeight
                 });
                 break;
             }
 
-            $('#viewerContainer').find('[data-page-number="' + pageId + '"]').append(div);
-
-            ctx.drawImage(imgToPaint, 0, 0, paintWidth, paintHeight, 0, -height, width, height);
+            $('#viewerContainer').find('[data-page-number="' + pageNumber + '"]').append(div);
 
             if (this.imageLayer) {
               var position = this.getCanvasPosition(0, -height);
@@ -17219,6 +17229,7 @@ window.signNameArrayIndex = 0;
           },
           getCanvasPosition: function CanvasGraphics_getCanvasPosition(x, y) {
             var transform = this.ctx.mozCurrentTransform;
+
             return [transform[0] * x + transform[2] * y + transform[4], transform[1] * x + transform[3] * y + transform[5]];
           }
         };

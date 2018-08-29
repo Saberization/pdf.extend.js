@@ -144,7 +144,7 @@
                 __div.appendChild(__img);
                 $curPageEl.append(__div);
 
-                signElArray.push({
+                window.signElArray.push({
                     pageNumber: pageNumber,
                     signEl: __div,
                     scale: signInfo.scale,
@@ -242,7 +242,7 @@
                     e.signDescription = '签名有效，由"' + cert.signer + '"签名，自应用本签名以来，"文档"未被修改';
                 } else {
                     e.signCls = 'error';
-                    e.signDescription = '签名无效，由"' + +cert.signer + +'"签名，自应用本签名以来，"文档"已被更改或损坏';
+                    e.signDescription = '签名无效，由"' + cert.signer + '"签名，自应用本签名以来，"文档"已被更改或损坏';
                 }
 
                 var blob = Util.base64ToBlob(cert.base64Cert);
