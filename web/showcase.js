@@ -69,8 +69,7 @@
         signElArray = [],
         newRotation = 0,
         delSerial,
-        signNameArray = [],
-        signNameArrayIndex = 0;
+        signNameArray = [];
 
     var toolbarHeight = $('#toolbarContainer').height();
 
@@ -125,7 +124,7 @@
                 var left = parseInt($(_div).css('left')),
                     top = parseInt($(_div).css('top'));
 
-                var $curPageEl = $viewerContainer.find('[data-page-number="'+ pageNumber +'"]'),
+                var $curPageEl = $viewerContainer.find('[data-page-number="' + pageNumber + '"]'),
                     __div = document.createElement('div'),
                     __img = document.createElement('img');
 
@@ -163,9 +162,9 @@
                 pageY = e.pageY;
 
             offsetLeft = this.offsetLeft + $mainContainer.get(0).offsetLeft,
-            offsetTop = this.offsetTop + $mainContainer.get(0).offsetTop;
+                offsetTop = this.offsetTop + $mainContainer.get(0).offsetTop;
 
-            if (_img && _div) {                
+            if (_img && _div) {
                 var top = pageY - offsetTop - _img.height / 2 + $viewerContainer.get(0).scrollTop - toolbarHeight,
                     left = pageX - offsetLeft - _img.width / 2;
 
@@ -181,7 +180,7 @@
                 pageY = e.pageY;
 
             offsetLeft = this.offsetLeft + $mainContainer.get(0).offsetLeft,
-            offsetTop = this.offsetTop + $mainContainer.get(0).offsetTop;
+                offsetTop = this.offsetTop + $mainContainer.get(0).offsetTop;
 
             if (_img && _div) {
                 var top = pageY - offsetTop - _img.height / 2 + $viewerContainer.get(0).scrollTop - toolbarHeight,
@@ -195,68 +194,69 @@
         }).on('mouseleave', function (e) {
             var movesign = $(this).find('.movesign');
 
-            $.each(movesign, function(i, e) {
+            $.each(movesign, function (i, e) {
                 e.remove();
             });
 
             _div = null;
             _img = null;
-        }).on('contextmenu', '._addSign', function(e) {
+        }).on('contextmenu', '._addSign', function (e) {
             e.preventDefault();
 
             delSerial = $(this).data('index');
-            
+
             $contextmenu.show();
             $contextmenu.css({
                 top: e.pageY,
                 left: e.pageX
             });
-        }).on('click', '._signature', function() {
-            var signid = $(this).data('signid'),
-                responseSignData = window.responseSignData || [];
-
-            if (responseSignData.length < 1) {
-                alert('暂无此签章信息');
-                return;
-            }
-
-            $.each(responseSignData, function(i, e) {
-                if (e.signid == signid) {
-                    var cert = e.cert;
-
-                    if (e.isIntegrity) {
-                        e.signCls = 'success';
-                        e.signDescription = '签名有效，由"'+ cert.signer +'"签名，自应用本签名以来，"文档"未被修改';
-                    }
-                    else {
-                        e.signCls = 'error';
-                        e.signDescription = '签名无效，由"'+ + cert.signer + +'"签名，自应用本签名以来，"文档"已被更改或损坏';
-                    }
-
-                    var blob = Util.base64ToBlob(cert.base64Cert);
-
-                    cert.certDownloadUrl = window.URL.createObjectURL(blob);
-                    e.signdate = Util.getDate(e.signdate);
-
-                    $uiPopupContent.html(Mustache.render($tplPopup, e));
-                    $uiPopup.addClass('zoomIn animated faster');
-                    $uiPopup.removeClass('hidden');
-                    window.URL.revokeObjectURL(blob);
-                }
-            });
         });
 
-        $uiPopup.on('click', '.ui-popup-close', function() {
+        $uiPopup.on('click', '.ui-popup-close', function () {
             $uiPopup.removeClass('zoomIn animated faster');
             $uiPopup.addClass('hidden');
         });
 
-        $contextmenu.on('click', 'li', function() {
-            $viewerContainer.find('[data-index="'+ delSerial +'"]').remove();
+        $contextmenu.on('click', 'li', function () {
+            $viewerContainer.find('[data-index="' + delSerial + '"]').remove();
             signElArray.splice(delSerial, 1, undefined);
             $contextmenu.hide();
         });
     }
+
+    window.signEvtClickCallback = function (event) {
+        var signid = this.dataset.signid,
+            responseSignData = window.responseSignData || [];
+
+        if (responseSignData.length < 1) {
+            alert('暂无此签章信息');
+            return;
+        }
+
+        $.each(responseSignData, function (i, e) {
+            if (e.signid == signid) {
+                var cert = e.cert;
+
+                if (e.isIntegrity) {
+                    e.signCls = 'success';
+                    e.signDescription = '签名有效，由"' + cert.signer + '"签名，自应用本签名以来，"文档"未被修改';
+                } else {
+                    e.signCls = 'error';
+                    e.signDescription = '签名无效，由"' + +cert.signer + +'"签名，自应用本签名以来，"文档"已被更改或损坏';
+                }
+
+                var blob = Util.base64ToBlob(cert.base64Cert);
+
+                cert.certDownloadUrl = window.URL.createObjectURL(blob);
+                e.signdate = Util.getDate(e.signdate);
+
+                $uiPopupContent.html(Mustache.render($tplPopup, e));
+                $uiPopup.addClass('zoomIn animated faster');
+                $uiPopup.removeClass('hidden');
+                window.URL.revokeObjectURL(blob);
+            }
+        });
+    };
 
     initListeners();
 
@@ -267,7 +267,6 @@
         multiSignStart,
         signElArray,
         newRotation,
-        signNameArray,
-        signNameArrayIndex
+        signNameArray
     }
 }));

@@ -210,10 +210,11 @@ var pdfJsApi;
       _pdfjsLib.PDFJS.locale = _pdfjsLib.PDFJS.locale === undefined && typeof navigator !== 'undefined' ? navigator.language : _pdfjsLib.PDFJS.locale;
     }
 
-    function getOutputScale(ctx) {
+    window.getOutputScale = function getOutputScale(ctx) {
       var devicePixelRatio = window.devicePixelRatio || 1;
       var backingStoreRatio = ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1;
       var pixelRatio = devicePixelRatio / backingStoreRatio;
+
       return {
         sx: pixelRatio,
         sy: pixelRatio,

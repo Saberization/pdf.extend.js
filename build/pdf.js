@@ -16,6 +16,8 @@
 var firstPositionWidth = 0,
   firstPositionHeight = 0;
 
+window.signNameArrayIndex = 0;
+
 (function webpackUniversalModuleDefinition(root, factory) {
   if (typeof exports === 'object' && typeof module === 'object')
     module.exports = factory();
@@ -17051,14 +17053,18 @@ var firstPositionWidth = 0,
               tmpCanvasId = tmpCanvasId === 'prescale1' ? 'prescale2' : 'prescale1';
             }
 
+            var devicePixelRatio = window.getOutputScale(ctx) && window.getOutputScale(ctx).sx;
+
             // TODO: 这里是真正绘制签章的地方。
             var position = this.getCanvasPosition(0, -height),
-              positionLeft = position[0] / 2,
-              positionTop = position[1] / 2,
-              positionWidth = width / currentTransform[0] / 2,
-              positionHeight = height / currentTransform[3] / 2,
+              positionLeft = position[0] / devicePixelRatio,
+              positionTop = position[1] / devicePixelRatio,
+              positionWidth = width / currentTransform[0] / devicePixelRatio,
+              positionHeight = height / currentTransform[3] / devicePixelRatio,
               pageId = this.ctx.canvas.id,
-              signNameArray = window.signNameArray;
+              signNameArray = window.signNameArray,
+              signNameArrayIndex = window.signNameArrayIndex,
+              signEvtClickCallback = window.signEvtClickCallback;
 
             pageId = parseInt(pageId.replace('page', ''), 10);
 
@@ -17080,9 +17086,18 @@ var firstPositionWidth = 0,
               cursor: 'pointer'
             });
 
-            $(div).attr('data-signid', signNameArray[window.signNameArrayIndex]);
+            div.setAttribute('data-signid', signNameArray[signNameArrayIndex]);
+            
+            if (signNameArrayIndex >= (signNameArray.length - 1)) {
+              window.signNameArrayIndex = 0;
+            }
+            else {
+              window.signNameArrayIndex++;
+            }
 
-            window.signNameArrayIndex++;
+            if (signEvtClickCallback && typeof signEvtClickCallback == 'function') {
+              div.onclick = signEvtClickCallback;
+            }
 
             switch (window.newRotation) {
               case 0:
