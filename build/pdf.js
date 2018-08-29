@@ -17065,8 +17065,8 @@ window.signNameArrayIndex = 0;
             var position = ctx.canvas.id ? this.getCanvasPosition(0, -height) : this.getCanvasPosition(width * 2, height),
               positionLeft = parseInt((position[0] / devicePixelRatio).toFixed(2), 10),
               positionTop = parseInt((position[1] / devicePixelRatio).toFixed(2), 10),
-              positionWidth = parseInt((width / currentTransform[0] / devicePixelRatio).toFixed(2), 10) || (firstPositionWidth / initScale * signInfo.scale),
-              positionHeight = parseInt((height / currentTransform[3] / devicePixelRatio).toFixed(2), 10) || (firstPositionHeight / initScale * signInfo.scale),
+              positionWidth = Math.abs(parseInt((width / currentTransform[0] / devicePixelRatio).toFixed(2), 10)) || (firstPositionWidth / initScale * signInfo.scale),
+              positionHeight = Math.abs(parseInt((height / currentTransform[3] / devicePixelRatio).toFixed(2), 10)) || (firstPositionHeight / initScale * signInfo.scale),
               pageId = this.pageId,
               signNameArray = window.signNameArray,
               signNameArrayIndex = window.signNameArrayIndex,
@@ -17092,7 +17092,9 @@ window.signNameArrayIndex = 0;
 
             $(div).css({
               position: 'absolute',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              width: positionWidth,
+              height: positionHeight
             });
 
             div.setAttribute('data-signid', signNameArray[signNameArrayIndex]);
@@ -17119,35 +17121,35 @@ window.signNameArrayIndex = 0;
                 $(div).css({
                   left: positionLeft,
                   top: positionTop,
-                  width: positionWidth,
-                  height: positionHeight
+                  right: 'auto',
+                  bottom: 'auto'
                 });
                 break;
 
               case 90:
                 $(div).css({
-                    left: positionLeft - positionHeight,
-                    top: positionTop,
-                    width: positionWidth,
-                    height: positionHeight
+                  right: positionLeft,
+                  left: 'auto',
+                  top: positionTop,
+                  bottom: 'auto'
                 });
                 break;
 
               case 180:
                 $(div).css({
-                  left: positionLeft - positionHeight,
-                  top: positionTop - positionWidth,
-                  width: positionWidth,
-                  height: positionHeight
+                  left: positionLeft - positionWidth,
+                  bottom: positionTop,
+                  right: 'auto',
+                  top: 'auto'
                 });
                 break;
 
               case 270:
                 $(div).css({
+                  right: 'auto',
                   left: positionLeft,
-                  top: positionTop - positionWidth,
-                  width: positionWidth,
-                  height: positionHeight
+                  top: positionTop - positionHeight,
+                  bottom: 'auto'
                 });
                 break;
             }
