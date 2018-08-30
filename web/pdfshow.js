@@ -10397,7 +10397,6 @@ var pdfJsApi;
                 for (var property in eventDetails) {
                   details[property] = eventDetails[property];
                 }
-                console.log(eventName, details);
                 _this.eventBus.dispatch(eventName, details);
               }
               if (close) {
