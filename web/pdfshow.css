@@ -354,3 +354,7 @@
     outline: 0;
     opacity: 0.5;
 }
+
+section[data-annotation-id]:hover {
+    border: 2px dashed rgba(173, 173, 173, 173);
+}

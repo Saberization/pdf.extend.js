@@ -13,15 +13,6 @@
  * limitations under the License.
  */
 
-var firstPositionWidth = 0,
-  firstPositionHeight = 0,
-  firstPositionLeft = 0,
-  firstPositionTop = 0;
-
-var initScale = 0;
-
-window.signNameArrayIndex = 0;
-
 (function webpackUniversalModuleDefinition(root, factory) {
   if (typeof exports === 'object' && typeof module === 'object')
     module.exports = factory();
@@ -5953,12 +5944,13 @@ window.signNameArrayIndex = 0;
             container.style.top = rect[1] + 'px';
             container.style.width = width + 'px';
             container.style.height = height + 'px';
+
             return container;
           }
         }, {
           key: '_createSignContainer',
           value: function _createSignContainer() {
-            // TODO: _createSignContainer
+            // TODO: _createSignContainer 创建签章注释，重要函数！！！！
             var data = this.data,
               page = this.page,
               viewport = this.viewport;
@@ -6011,6 +6003,14 @@ window.signNameArrayIndex = 0;
             container.style.top = rect[1] + 'px';
             container.style.width = width + 'px';
             container.style.height = height + 'px';
+
+            var div = document.createElement('div');
+
+            div.style.width = width + 'px';
+            div.style.height = height + 'px';
+            div.style.cursor = 'pointer';
+
+            container.appendChild(div);
 
             this.layer.appendChild(container);
 
@@ -17129,106 +17129,6 @@ window.signNameArrayIndex = 0;
             }
 
             ctx.drawImage(imgToPaint, 0, 0, paintWidth, paintHeight, 0, -height, width, height);
-
-            // var devicePixelRatio = window.getOutputScale(ctx) && window.getOutputScale(ctx).sx;
-
-            // // TODO: 这里是真正绘制签章的地方。
-            // var position = ctx.canvas.id ? this.getCanvasPosition(0, -height) : this.getCanvasPosition(width, height),
-            //   positionLeft = Math.abs(parseInt((position[0] / devicePixelRatio).toFixed(2), 10)),
-            //   positionTop = Math.abs(parseInt((position[1] / devicePixelRatio).toFixed(2), 10)),
-            //   positionWidth = Math.abs(parseInt((width / currentTransform[0] / devicePixelRatio).toFixed(2), 10)) || (firstPositionWidth / initScale * signInfo.scale),
-            //   positionHeight = Math.abs(parseInt((height / currentTransform[3] / devicePixelRatio).toFixed(2), 10)) || (firstPositionHeight / initScale * signInfo.scale),
-            //   pageId = this.pageId,
-            //   signNameArray = window.signNameArray,
-            //   signNameArrayIndex = window.signNameArrayIndex,
-            //   signEvtClickCallback = window.signEvtClickCallback,
-            //   pageNumber = parseInt(pageId.replace('page', ''), 10);
-
-            // if (signInfo.scale > 2 && devicePixelRatio == 2) {
-            //   positionWidth = firstPositionWidth / initScale * signInfo.scale;
-            //   positionHeight = firstPositionHeight / initScale * signInfo.scale;
-            //   positionLeft = firstPositionLeft / initScale * signInfo.scale;
-            //   positionTop = firstPositionTop / initScale * signInfo.scale;
-            // }
-
-            // var div = document.createElement('div');
-
-            // $(div).addClass('_signature');
-            // $(div).hover(function () {
-            //   $(this).css({
-            //     border: '2px dashed rgba(173, 173, 173)'
-            //   });
-            // }, function () {
-            //   $(this).css({
-            //     border: 0
-            //   });
-            // });
-
-            // $(div).css({
-            //   position: 'absolute',
-            //   cursor: 'pointer',
-            //   width: positionWidth,
-            //   height: positionHeight
-            // });
-
-            // div.setAttribute('data-signid', signNameArray[signNameArrayIndex]);
-            
-            // if (signNameArrayIndex >= (signNameArray.length - 1)) {
-            //   window.signNameArrayIndex = 0;
-            // }
-            // else {
-            //   window.signNameArrayIndex++;
-            // }
-
-            // if (signEvtClickCallback && typeof signEvtClickCallback == 'function') {
-            //   div.onclick = signEvtClickCallback;
-            // }
-
-            // switch (window.newRotation) {
-            //   case 0:
-            //     firstPositionWidth = positionWidth;
-            //     firstPositionHeight = positionHeight;
-            //     firstPositionLeft = positionLeft;
-            //     firstPositionTop = positionTop;
-            //     initScale = signInfo.scale;
-
-            //     $(div).css({
-            //       left: positionLeft,
-            //       top: positionTop,
-            //       right: 'auto',
-            //       bottom: 'auto'
-            //     });
-            //     break;
-
-            //   case 90:
-            //     $(div).css({
-            //       right: positionLeft,
-            //       left: 'auto',
-            //       top: positionTop,
-            //       bottom: 'auto'
-            //     });
-            //     break;
-
-            //   case 180:
-            //     $(div).css({
-            //       left: positionLeft - positionWidth,
-            //       bottom: positionTop,
-            //       right: 'auto',
-            //       top: 'auto'
-            //     });
-            //     break;
-
-            //   case 270:
-            //     $(div).css({
-            //       right: 'auto',
-            //       left: positionLeft,
-            //       top: positionTop - positionHeight,
-            //       bottom: 'auto'
-            //     });
-            //     break;
-            // }
-
-            // $('#viewerContainer').find('[data-page-number="' + pageNumber + '"]').append(div);
 
             if (this.imageLayer) {
               var position = this.getCanvasPosition(0, -height);

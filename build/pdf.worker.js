@@ -27848,7 +27848,6 @@ var WidgetAnnotation = function WidgetAnnotationClosure() {
     data.readOnly = this.hasFieldFlag(_util.AnnotationFieldFlag.READONLY);
 
     if (data.fieldType === 'Sig') {
-      win.signNameArray.push(data.fieldName);
       // TODO: 显示数字签名
       // this.setFlags(_util.AnnotationFlag.HIDDEN);
     }

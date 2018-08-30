@@ -1913,7 +1913,6 @@ var pdfJsApi;
         var newRotation = (pdfViewer.pagesRotation + 360 + delta) % 360;
 
         window.newRotation = newRotation;
-        window.signNameArrayIndex = 0;
         pdfViewer.pagesRotation = newRotation;
         pdfThumbnailViewer.pagesRotation = newRotation;
         this.forceRendering();
@@ -2244,8 +2243,6 @@ var pdfJsApi;
 
           window.signElArray = [];
           window.newRotation = 0;
-          window.signNameArray = [];
-          window.signNameArrayIndex = 0;
           pdfJsApi.getNetWorkPath && pdfJsApi.getNetWorkPath.call(pdfJsApi, file);
         }
       };
@@ -2450,8 +2447,6 @@ var pdfJsApi;
 
         window.signElArray = [];
         window.newRotation = 0;
-        window.signNameArray = [];
-        window.signNameArrayIndex = 0;
 
         // TODO: 获取签章信息
         verify(file);
@@ -5156,6 +5151,7 @@ var pdfJsApi;
       }
     }
 
+    // TODO: AnnotationLayerBuilder 渲染注释签章的主要函数，重要
     var AnnotationLayerBuilder = function () {
       function AnnotationLayerBuilder(_ref) {
         var pageDiv = _ref.pageDiv,
@@ -5177,14 +5173,14 @@ var pdfJsApi;
         this.l10n = l10n;
         this.div = null;
       }
-
+      // TODO: 渲染注释签章的主要函数，重要!!!
       _createClass(AnnotationLayerBuilder, [{
         key: 'render',
         value: function render(viewport) {
           var _this = this;
 
           var intent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'display';
-          // TODO: AnnotationLayerBuilder
+          // TODO: AnnotationLayerBuilder 渲染签章
           this.pdfPage.getAnnotations({
             intent: intent
           }).then(function (annotations) {
@@ -11027,8 +11023,6 @@ var pdfJsApi;
             thumbnailView.innerHTML = '';
             window.signElArray = [];
             window.newRotation = 0;
-            window.signNameArray = [];
-            window.signNameArrayIndex = 0;
           });
           items.print.addEventListener('click', function () {
             eventBus.dispatch('print');
