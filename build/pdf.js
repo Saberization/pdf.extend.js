@@ -5878,13 +5878,10 @@
           this.renderInteractiveForms = parameters.renderInteractiveForms;
           this.svgFactory = parameters.svgFactory;
 
-          console.log(parameters);
-
           if (isRenderable) {
             this.container = this._createContainer(ignoreBorder);
           }
           else {
-            console.log(this);
             this.container = this._createSignContainer();
           }
         }

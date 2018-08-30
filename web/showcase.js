@@ -209,6 +209,38 @@
                 top: e.pageY,
                 left: e.pageX
             });
+        }).on('click', 'section[data-annotation-id]', function() {
+            var id = $(this).attr('data-annotation-id'),
+                signData = window.responseSignData || [];
+
+            if (signData.length < 1) {
+                alert('暂无此签章信息');
+                return;
+            }
+
+            $.each(signData, function(i, e) {
+                if (e.id == id) {
+                    var cert = e.cert;
+    
+                    if (e.isIntegrity) {
+                        e.signCls = 'success';
+                        e.signDescription = '签名有效，由"' + cert.signer + '"签名，自应用本签名以来，"文档"未被修改';
+                    } else {
+                        e.signCls = 'error';
+                        e.signDescription = '签名无效，由"' + cert.signer + '"签名，自应用本签名以来，"文档"已被更改或损坏';
+                    }
+    
+                    var blob = Util.base64ToBlob(cert.base64Cert);
+    
+                    cert.certDownloadUrl = window.URL.createObjectURL(blob);
+                    e.signdate = Util.getDate(e.signdate);
+    
+                    $uiPopupContent.html(Mustache.render($tplPopup, e));
+                    $uiPopup.addClass('zoomIn animated faster');
+                    $uiPopup.removeClass('hidden');
+                    window.URL.revokeObjectURL(blob);
+                }
+            });
         });
 
         $uiPopup.on('click', '.ui-popup-close', function () {
@@ -222,40 +254,6 @@
             $contextmenu.hide();
         });
     }
-
-    window.signEvtClickCallback = function (event) {
-        var signid = this.dataset.signid,
-            responseSignData = window.responseSignData || [];
-
-        if (responseSignData.length < 1) {
-            alert('暂无此签章信息');
-            return;
-        }
-
-        $.each(responseSignData, function (i, e) {
-            if (e.signid == signid) {
-                var cert = e.cert;
-
-                if (e.isIntegrity) {
-                    e.signCls = 'success';
-                    e.signDescription = '签名有效，由"' + cert.signer + '"签名，自应用本签名以来，"文档"未被修改';
-                } else {
-                    e.signCls = 'error';
-                    e.signDescription = '签名无效，由"' + cert.signer + '"签名，自应用本签名以来，"文档"已被更改或损坏';
-                }
-
-                var blob = Util.base64ToBlob(cert.base64Cert);
-
-                cert.certDownloadUrl = window.URL.createObjectURL(blob);
-                e.signdate = Util.getDate(e.signdate);
-
-                $uiPopupContent.html(Mustache.render($tplPopup, e));
-                $uiPopup.addClass('zoomIn animated faster');
-                $uiPopup.removeClass('hidden');
-                window.URL.revokeObjectURL(blob);
-            }
-        });
-    };
 
     initListeners();
 

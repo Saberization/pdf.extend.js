@@ -2380,8 +2380,7 @@ var pdfJsApi;
 
     var verify = void 0; {
       verify = function verify(file) {
-        // var url = 'http://192.168.108.217:8090/pdf/verify';
-        var url = 'http://192.168.108.81:8090/pdf/verify';
+        var url = window.signInfo.verifyUrl;
         var formData = new FormData();
 
         if (typeof file == 'string') {
