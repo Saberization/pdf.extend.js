@@ -2390,7 +2390,8 @@ var pdfJsApi;
         if (typeof file == 'string') {
           formData.append('type', 'url');
           formData.append('msg', file);
-        } else {
+        }
+        else {
           formData.append('file', file);
           formData.append('type', 'file');
         }
@@ -5184,7 +5185,7 @@ var pdfJsApi;
           var _this = this;
 
           var intent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'display';
-          // TODO: AnnotationLayerBuilder
+
           this.pdfPage.getAnnotations({
             intent: intent
           }).then(function (annotations) {
@@ -5199,7 +5200,6 @@ var pdfJsApi;
               linkService: _this.linkService,
               downloadManager: _this.downloadManager
             };
-
             if (_this.div) {
               _pdfjsLib.AnnotationLayer.update(parameters);
             } else {
@@ -7371,11 +7371,6 @@ var pdfJsApi;
         key: 'getPagePoint',
         value: function getPagePoint(x, y) {
           return this.viewport.convertToPdfPoint(x, y);
-        }
-      }, {
-        key: 'setupAnnotations',
-        value: function setupAnnotations(page, viewport, canvas, $annotationLayerDiv) {
-
         }
       }, {
         key: 'draw',

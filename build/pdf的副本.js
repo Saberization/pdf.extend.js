@@ -5886,15 +5886,8 @@ window.signNameArrayIndex = 0;
           this.imageResourcesPath = parameters.imageResourcesPath;
           this.renderInteractiveForms = parameters.renderInteractiveForms;
           this.svgFactory = parameters.svgFactory;
-
-          console.log(parameters);
-
           if (isRenderable) {
             this.container = this._createContainer(ignoreBorder);
-          }
-          else {
-            console.log(this);
-            this.container = this._createSignContainer();
           }
         }
 
@@ -5902,6 +5895,7 @@ window.signNameArrayIndex = 0;
           key: '_createContainer',
           value: function _createContainer() {
             var ignoreBorder = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
             var data = this.data,
               page = this.page,
               viewport = this.viewport;
@@ -5953,67 +5947,6 @@ window.signNameArrayIndex = 0;
             container.style.top = rect[1] + 'px';
             container.style.width = width + 'px';
             container.style.height = height + 'px';
-            return container;
-          }
-        }, {
-          key: '_createSignContainer',
-          value: function _createSignContainer() {
-            // TODO: _createSignContainer
-            var data = this.data,
-              page = this.page,
-              viewport = this.viewport;
-            var container = document.createElement('section');
-            var width = data.rect[2] - data.rect[0];
-            var height = data.rect[3] - data.rect[1];
-            container.setAttribute('data-annotation-id', data.id);
-
-            var rect = _util.Util.normalizeRect([data.rect[0], page.view[3] - data.rect[1] + page.view[1], data.rect[2], page.view[3] - data.rect[3] + page.view[1]]);
-            _dom_utils.CustomStyle.setProp('transform', container, 'matrix(' + viewport.transform.join(',') + ')');
-            _dom_utils.CustomStyle.setProp('transformOrigin', container, -rect[0] + 'px ' + -rect[1] + 'px');
-            if (data.borderStyle.width > 0) {
-              container.style.borderWidth = data.borderStyle.width + 'px';
-              if (data.borderStyle.style !== _util.AnnotationBorderStyleType.UNDERLINE) {
-                width = width - 2 * data.borderStyle.width;
-                height = height - 2 * data.borderStyle.width;
-              }
-              var horizontalRadius = data.borderStyle.horizontalCornerRadius;
-              var verticalRadius = data.borderStyle.verticalCornerRadius;
-              if (horizontalRadius > 0 || verticalRadius > 0) {
-                var radius = horizontalRadius + 'px / ' + verticalRadius + 'px';
-                _dom_utils.CustomStyle.setProp('borderRadius', container, radius);
-              }
-              switch (data.borderStyle.style) {
-                case _util.AnnotationBorderStyleType.SOLID:
-                  container.style.borderStyle = 'solid';
-                  break;
-                case _util.AnnotationBorderStyleType.DASHED:
-                  container.style.borderStyle = 'dashed';
-                  break;
-                case _util.AnnotationBorderStyleType.BEVELED:
-                  (0, _util.warn)('Unimplemented border style: beveled');
-                  break;
-                case _util.AnnotationBorderStyleType.INSET:
-                  (0, _util.warn)('Unimplemented border style: inset');
-                  break;
-                case _util.AnnotationBorderStyleType.UNDERLINE:
-                  container.style.borderBottomStyle = 'solid';
-                  break;
-                default:
-                  break;
-              }
-              if (data.color) {
-                container.style.borderColor = _util.Util.makeCssRgb(data.color[0] | 0, data.color[1] | 0, data.color[2] | 0);
-              } else {
-                container.style.borderWidth = 0;
-              }
-            }
-            container.style.left = rect[0] + 'px';
-            container.style.top = rect[1] + 'px';
-            container.style.width = width + 'px';
-            container.style.height = height + 'px';
-
-            this.layer.appendChild(container);
-
             return container;
           }
         }, {
@@ -6810,7 +6743,6 @@ window.signNameArrayIndex = 0;
           _classCallCheck(this, AnnotationLayer);
         }
 
-        // TODO: AnnotationLayer
         _createClass(AnnotationLayer, null, [{
           key: 'render',
           value: function render(parameters) {
@@ -6830,7 +6762,6 @@ window.signNameArrayIndex = 0;
                 renderInteractiveForms: parameters.renderInteractiveForms || false,
                 svgFactory: new _dom_utils.DOMSVGFactory()
               });
-              
               if (element.isRenderable) {
                 parameters.div.appendChild(element.render());
               }
@@ -17130,105 +17061,107 @@ window.signNameArrayIndex = 0;
 
             ctx.drawImage(imgToPaint, 0, 0, paintWidth, paintHeight, 0, -height, width, height);
 
-            // var devicePixelRatio = window.getOutputScale(ctx) && window.getOutputScale(ctx).sx;
+            var devicePixelRatio = window.getOutputScale(ctx) && window.getOutputScale(ctx).sx;
 
-            // // TODO: 这里是真正绘制签章的地方。
-            // var position = ctx.canvas.id ? this.getCanvasPosition(0, -height) : this.getCanvasPosition(width, height),
-            //   positionLeft = Math.abs(parseInt((position[0] / devicePixelRatio).toFixed(2), 10)),
-            //   positionTop = Math.abs(parseInt((position[1] / devicePixelRatio).toFixed(2), 10)),
-            //   positionWidth = Math.abs(parseInt((width / currentTransform[0] / devicePixelRatio).toFixed(2), 10)) || (firstPositionWidth / initScale * signInfo.scale),
-            //   positionHeight = Math.abs(parseInt((height / currentTransform[3] / devicePixelRatio).toFixed(2), 10)) || (firstPositionHeight / initScale * signInfo.scale),
-            //   pageId = this.pageId,
-            //   signNameArray = window.signNameArray,
-            //   signNameArrayIndex = window.signNameArrayIndex,
-            //   signEvtClickCallback = window.signEvtClickCallback,
-            //   pageNumber = parseInt(pageId.replace('page', ''), 10);
+            // TODO: 这里是真正绘制签章的地方。
+            var position = ctx.canvas.id ? this.getCanvasPosition(0, -height) : this.getCanvasPosition(width, height),
+              positionLeft = Math.abs(parseInt((position[0] / devicePixelRatio).toFixed(2), 10)),
+              positionTop = Math.abs(parseInt((position[1] / devicePixelRatio).toFixed(2), 10)),
+              positionWidth = Math.abs(parseInt((width / currentTransform[0] / devicePixelRatio).toFixed(2), 10)) || (firstPositionWidth / initScale * signInfo.scale),
+              positionHeight = Math.abs(parseInt((height / currentTransform[3] / devicePixelRatio).toFixed(2), 10)) || (firstPositionHeight / initScale * signInfo.scale),
+              pageId = this.pageId,
+              signNameArray = window.signNameArray,
+              signNameArrayIndex = window.signNameArrayIndex,
+              signEvtClickCallback = window.signEvtClickCallback,
+              pageNumber = parseInt(pageId.replace('page', ''), 10);
 
-            // if (signInfo.scale > 2 && devicePixelRatio == 2) {
-            //   positionWidth = firstPositionWidth / initScale * signInfo.scale;
-            //   positionHeight = firstPositionHeight / initScale * signInfo.scale;
-            //   positionLeft = firstPositionLeft / initScale * signInfo.scale;
-            //   positionTop = firstPositionTop / initScale * signInfo.scale;
-            // }
+            if (signInfo.scale > 2 && devicePixelRatio == 2) {
+              positionWidth = firstPositionWidth / initScale * signInfo.scale;
+              positionHeight = firstPositionHeight / initScale * signInfo.scale;
+              positionLeft = firstPositionLeft / initScale * signInfo.scale;
+              positionTop = firstPositionTop / initScale * signInfo.scale;
+            }
 
-            // var div = document.createElement('div');
+            var div = document.createElement('div');
 
-            // $(div).addClass('_signature');
-            // $(div).hover(function () {
-            //   $(this).css({
-            //     border: '2px dashed rgba(173, 173, 173)'
-            //   });
-            // }, function () {
-            //   $(this).css({
-            //     border: 0
-            //   });
-            // });
+            $(div).addClass('_signature');
+            $(div).hover(function () {
+              $(this).css({
+                border: '2px dashed rgba(173, 173, 173)'
+              });
+            }, function () {
+              $(this).css({
+                border: 0
+              });
+            });
 
-            // $(div).css({
-            //   position: 'absolute',
-            //   cursor: 'pointer',
-            //   width: positionWidth,
-            //   height: positionHeight
-            // });
+            $(div).css({
+              position: 'absolute',
+              cursor: 'pointer',
+              width: positionWidth,
+              height: positionHeight
+            });
 
-            // div.setAttribute('data-signid', signNameArray[signNameArrayIndex]);
+            div.setAttribute('data-signid', signNameArray[signNameArrayIndex]);
             
-            // if (signNameArrayIndex >= (signNameArray.length - 1)) {
-            //   window.signNameArrayIndex = 0;
-            // }
-            // else {
-            //   window.signNameArrayIndex++;
-            // }
+            if (signNameArrayIndex >= (signNameArray.length - 1)) {
+              window.signNameArrayIndex = 0;
+            }
+            else {
+              window.signNameArrayIndex++;
+            }
 
-            // if (signEvtClickCallback && typeof signEvtClickCallback == 'function') {
-            //   div.onclick = signEvtClickCallback;
-            // }
+            if (signEvtClickCallback && typeof signEvtClickCallback == 'function') {
+              div.onclick = signEvtClickCallback;
+            }
 
-            // switch (window.newRotation) {
-            //   case 0:
-            //     firstPositionWidth = positionWidth;
-            //     firstPositionHeight = positionHeight;
-            //     firstPositionLeft = positionLeft;
-            //     firstPositionTop = positionTop;
-            //     initScale = signInfo.scale;
+            switch (window.newRotation) {
+              case 0:
+                firstPositionWidth = positionWidth;
+                firstPositionHeight = positionHeight;
+                firstPositionLeft = positionLeft;
+                firstPositionTop = positionTop;
+                initScale = signInfo.scale;
 
-            //     $(div).css({
-            //       left: positionLeft,
-            //       top: positionTop,
-            //       right: 'auto',
-            //       bottom: 'auto'
-            //     });
-            //     break;
+                $(div).css({
+                  left: positionLeft,
+                  top: positionTop,
+                  right: 'auto',
+                  bottom: 'auto'
+                });
+                break;
 
-            //   case 90:
-            //     $(div).css({
-            //       right: positionLeft,
-            //       left: 'auto',
-            //       top: positionTop,
-            //       bottom: 'auto'
-            //     });
-            //     break;
+              case 90:
+                $(div).css({
+                  right: positionLeft,
+                  left: 'auto',
+                  top: positionTop,
+                  bottom: 'auto'
+                });
+                break;
 
-            //   case 180:
-            //     $(div).css({
-            //       left: positionLeft - positionWidth,
-            //       bottom: positionTop,
-            //       right: 'auto',
-            //       top: 'auto'
-            //     });
-            //     break;
+              case 180:
+                $(div).css({
+                  left: positionLeft - positionWidth,
+                  bottom: positionTop,
+                  right: 'auto',
+                  top: 'auto'
+                });
+                break;
 
-            //   case 270:
-            //     $(div).css({
-            //       right: 'auto',
-            //       left: positionLeft,
-            //       top: positionTop - positionHeight,
-            //       bottom: 'auto'
-            //     });
-            //     break;
-            // }
+              case 270:
+                $(div).css({
+                  right: 'auto',
+                  left: positionLeft,
+                  top: positionTop - positionHeight,
+                  bottom: 'auto'
+                });
+                break;
+            }
 
-            // $('#viewerContainer').find('[data-page-number="' + pageNumber + '"]').append(div);
+            $('#viewerContainer').find('[data-page-number="' + pageNumber + '"]').append(div);
+
+            console.log(this);
 
             if (this.imageLayer) {
               var position = this.getCanvasPosition(0, -height);
