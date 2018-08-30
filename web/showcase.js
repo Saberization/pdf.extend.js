@@ -250,7 +250,7 @@
 
         $contextmenu.on('click', 'li', function () {
             $viewerContainer.find('[data-index="' + delSerial + '"]').remove();
-            signElArray.splice(delSerial, 1, undefined);
+            window.signElArray.splice(delSerial, 1, undefined);
             $contextmenu.hide();
         });
     }
