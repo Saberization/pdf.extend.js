@@ -1886,6 +1886,7 @@ var pdfJsApi;
           return;
         }
         var pagesOverview = this.pdfViewer.getPagesOverview();
+
         var printContainer = this.appConfig.printContainer;
         var printService = PDFPrintServiceFactory.instance.createPrintService(this.pdfDocument, pagesOverview, printContainer, this.l10n);
         this.printService = printService;
@@ -2527,6 +2528,7 @@ var pdfJsApi;
       PDFViewerApplication.pdfDocumentProperties.open();
     }
 
+    // TODO: webViewerFind
     function webViewerFind(evt) {
       PDFViewerApplication.findController.executeCommand('find' + evt.type, {
         query: evt.query,
@@ -2620,6 +2622,7 @@ var pdfJsApi;
       }
     }
 
+    // TODO: webViewerKeyDown
     function webViewerKeyDown(evt) {
       if (PDFViewerApplication.overlayManager.active) {
         return;
@@ -2629,6 +2632,7 @@ var pdfJsApi;
       var cmd = (evt.ctrlKey ? 1 : 0) | (evt.altKey ? 2 : 0) | (evt.shiftKey ? 4 : 0) | (evt.metaKey ? 8 : 0);
       var pdfViewer = PDFViewerApplication.pdfViewer;
       var isViewerInPresentationMode = pdfViewer && pdfViewer.isInPresentationMode;
+
       if (cmd === 1 || cmd === 8 || cmd === 5 || cmd === 12) {
         switch (evt.keyCode) {
           case 70:
@@ -4090,8 +4094,9 @@ var pdfJsApi;
 
     var activeService = null;
     var overlayManager = null;
+    var signService = null;
 
-    // TODO: renderPage 渲染页面
+    // TODO: renderPage 打印是在这里渲染页面的。
     function renderPage(activeServiceOnEntry, pdfDocument, pageNumber, size) {
       var scratchCanvas = activeService.scratchCanvas;
       var PRINT_RESOLUTION = 150;
@@ -4129,6 +4134,7 @@ var pdfJsApi;
       this.currentPage = -1;
       this.scratchCanvas = document.createElement('canvas');
     }
+    // TODO: PDFPrintService
     PDFPrintService.prototype = {
       layout: function layout() {
         this.throwIfInactive();
@@ -4168,6 +4174,7 @@ var pdfJsApi;
         var _this = this;
 
         var pageCount = this.pagesOverview.length;
+        // TODO: 这里是打印的时候，渲染渲染全部页面的地方
         var renderNextPage = function renderNextPage(resolve, reject) {
           _this.throwIfInactive();
           if (++_this.currentPage >= pageCount) {
@@ -4175,6 +4182,7 @@ var pdfJsApi;
             resolve();
             return;
           }
+
           var index = _this.currentPage;
           renderProgress(index, pageCount, _this.l10n);
           renderPage(_this, _this.pdfDocument, index + 1, _this.pagesOverview[index]).then(_this.useRenderedPage.bind(_this)).then(function () {
@@ -4254,7 +4262,7 @@ var pdfJsApi;
         }
         var activeServiceOnEntry = activeService;
         activeService.renderPages().then(function () {
-          return activeServiceOnEntry.performPrint();
+          return  activeServiceOnEntry.performPrint();
         }).catch(function () {}).then(function () {
           if (activeServiceOnEntry.active) {
             abort();
@@ -4342,6 +4350,7 @@ var pdfJsApi;
           throw new Error('The print service is created and active.');
         }
         activeService = new PDFPrintService(pdfDocument, pagesOverview, printContainer, l10n);
+
         return activeService;
       }
     };
@@ -11469,6 +11478,9 @@ var pdfJsApi;
         },
         linkTo: function (text) {
           window.linkTo && window.linkTo(text);
+        },
+        getSignTotal: function (result) {
+          window.print && window.print();
         }
       };
 
